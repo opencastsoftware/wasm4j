@@ -1,6 +1,6 @@
 package com.opencastsoftware.wasm4j;
 
-import java.io.ByteArrayOutputStream;
+import io.netty.buffer.ByteBuf;
 
 public class LEB128 {
     private static final byte LOW_7_BITS = 0x7F;
@@ -10,53 +10,59 @@ public class LEB128 {
     private LEB128() {
     }
 
-    public static void writeUnsigned(ByteArrayOutputStream out, long i) {
+    public static void writeUnsigned(ByteBuf out, long i) {
         while (true) {
             if (i < CONTINUATION_BIT) {
-                out.write((byte) (i & LOW_7_BITS));
+                out.writeByte((byte) (i & LOW_7_BITS));
                 break;
             } else {
-                out.write((byte) (i & LOW_7_BITS | CONTINUATION_BIT));
+                out.writeByte((byte) (i & LOW_7_BITS | CONTINUATION_BIT));
                 i >>>= 7;
             }
         }
     }
 
-    public static int readUnsignedInt(byte[] in) {
+    public static int readUnsignedInt(ByteBuf in) {
         int result = 0;
         int shift = 0;
 
-        for (byte value : in) {
+        while (in.isReadable()) {
+            byte value = in.readByte();
+
             if ((value & CONTINUATION_BIT) == 0) {
                 result |= ((int) value << shift);
                 break;
             } else {
                 result |= ((value & LOW_7_BITS) << shift);
             }
+
             shift += 7;
         }
 
         return result;
     }
 
-    public static long readUnsignedLong(byte[] in) {
+    public static long readUnsignedLong(ByteBuf in) {
         long result = 0;
         int shift = 0;
 
-        for (byte value : in) {
+        while (in.isReadable()) {
+            byte value = in.readByte();
+
             if ((value & CONTINUATION_BIT) == 0) {
                 result |= ((long) value << shift);
                 break;
             } else {
                 result |= (((long) (value & LOW_7_BITS)) << shift);
             }
+
             shift += 7;
         }
 
         return result;
     }
 
-    public static void writeSigned(ByteArrayOutputStream out, long longValue) {
+    public static void writeSigned(ByteBuf out, long longValue) {
         while (true) {
             byte byteValue = (byte) (((byte) longValue) & LOW_7_BITS);
             longValue >>= 7;
@@ -68,7 +74,7 @@ public class LEB128 {
                 byteValue |= CONTINUATION_BIT;
             }
 
-            out.write(byteValue);
+            out.writeByte(byteValue);
 
             if (!more) {
                 break;
@@ -76,13 +82,13 @@ public class LEB128 {
         }
     }
 
-    public static int readSignedInt(byte[] in) {
+    public static int readSignedInt(ByteBuf in) {
         int result = 0;
         int shift = 0;
         byte value = 0;
 
-        for (byte b : in) {
-            value = b;
+        while (in.isReadable()) {
+            value = in.readByte();
             result |= ((value & LOW_7_BITS) << shift);
             shift += 7;
 
@@ -98,13 +104,13 @@ public class LEB128 {
         return result;
     }
 
-    public static long readSignedLong(byte[] in) {
+    public static long readSignedLong(ByteBuf in) {
         long result = 0L;
         int shift = 0;
         byte value = 0;
 
-        for (byte b : in) {
-            value = b;
+        while (in.isReadable()) {
+            value = in.readByte();
             result |= (((long) (value & LOW_7_BITS)) << shift);
             shift += 7;
 

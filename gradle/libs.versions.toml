@@ -1,10 +1,12 @@
 [versions]
 gradleJavaConventions = "0.1.0"
+gradleShadow = "8.1.0"
 equalsVerifier = "3.14"
 hamcrest = "2.2"
 jacoco = "0.8.8"
 jqwik = "1.7.2"
 junitJupiter = "5.9.1"
+nettyBuffer = "4.1.89.Final"
 toStringVerifier = "1.4.8"
 
 [libraries]
@@ -12,7 +14,9 @@ equalsVerifier = { module = "nl.jqno.equalsverifier:equalsverifier", version.ref
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
 junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
+nettyBuffer = { module = "io.netty:netty-buffer", version.ref = "nettyBuffer" }
 toStringVerifier = { module = "com.jparams:to-string-verifier", version.ref = "toStringVerifier" }
 
 [plugins]
 gradleJavaConventions = { id = "com.opencastsoftware.gradle.java-conventions", version.ref = "gradleJavaConventions" }
+gradleShadow = { id = "com.github.johnrengelman.shadow", version.ref = "gradleShadow" }

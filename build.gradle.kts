@@ -1,6 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     `java-library`
     alias(libs.plugins.gradleJavaConventions)
+    alias(libs.plugins.gradleShadow)
 }
 
 group = "com.opencastsoftware"
@@ -11,6 +14,7 @@ java {
 }
 
 dependencies {
+    implementation(libs.nettyBuffer)
     testImplementation(libs.junitJupiter)
     testImplementation(libs.hamcrest)
     testImplementation(libs.jqwik)
@@ -59,6 +63,11 @@ mavenPublishing {
             url.set("https://github.com/opencastsoftware/wasm4j")
         }
     }
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    isEnableRelocation = true
+    relocationPrefix = "com.opencastsoftware.wasm4j.shaded"
 }
 
 tasks.named<Test>("test") {
