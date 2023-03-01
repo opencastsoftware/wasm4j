@@ -10,7 +10,7 @@ public class LEB128 {
     private LEB128() {
     }
 
-    public static final void writeUnsigned(ByteArrayOutputStream out, long i) {
+    public static void writeUnsigned(ByteArrayOutputStream out, long i) {
         while (true) {
             if (i < CONTINUATION_BIT) {
                 out.write((byte) (i & LOW_7_BITS));
@@ -22,7 +22,7 @@ public class LEB128 {
         }
     }
 
-    public static final int readUnsignedInt(byte[] in) {
+    public static int readUnsignedInt(byte[] in) {
         int result = 0;
         int shift = 0;
 
@@ -31,7 +31,7 @@ public class LEB128 {
                 result |= ((int) value << shift);
                 break;
             } else {
-                result |= (((int) (value & LOW_7_BITS)) << shift);
+                result |= ((value & LOW_7_BITS) << shift);
             }
             shift += 7;
         }
@@ -39,7 +39,7 @@ public class LEB128 {
         return result;
     }
 
-    public static final long readUnsignedLong(byte[] in) {
+    public static long readUnsignedLong(byte[] in) {
         long result = 0;
         int shift = 0;
 
@@ -56,7 +56,7 @@ public class LEB128 {
         return result;
     }
 
-    public static final void writeSigned(ByteArrayOutputStream out, long longValue) {
+    public static void writeSigned(ByteArrayOutputStream out, long longValue) {
         while (true) {
             byte byteValue = (byte) (((byte) longValue) & LOW_7_BITS);
             longValue >>= 7;
@@ -76,14 +76,14 @@ public class LEB128 {
         }
     }
 
-    public static final int readSignedInt(byte[] in) {
+    public static int readSignedInt(byte[] in) {
         int result = 0;
         int shift = 0;
         byte value = 0;
 
-        for (int i = 0; i < in.length; i++) {
-            value = in[i];
-            result |= (((int) (value & LOW_7_BITS)) << shift);
+        for (byte b : in) {
+            value = b;
+            result |= ((value & LOW_7_BITS) << shift);
             shift += 7;
 
             if ((value & CONTINUATION_BIT) == 0) {
@@ -98,13 +98,13 @@ public class LEB128 {
         return result;
     }
 
-    public static final long readSignedLong(byte[] in) {
+    public static long readSignedLong(byte[] in) {
         long result = 0L;
         int shift = 0;
         byte value = 0;
 
-        for (int i = 0; i < in.length; i++) {
-            value = in[i];
+        for (byte b : in) {
+            value = b;
             result |= (((long) (value & LOW_7_BITS)) << shift);
             shift += 7;
 
