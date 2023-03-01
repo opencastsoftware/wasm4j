@@ -7,6 +7,9 @@ public class LEB128 {
     private static final int CONTINUATION_BIT = 0x80;
     private static final byte SIGN_BIT = 0x40;
 
+    private LEB128() {
+    }
+
     public static final void writeUnsigned(ByteArrayOutputStream out, long i) {
         while (true) {
             if (i < CONTINUATION_BIT) {
