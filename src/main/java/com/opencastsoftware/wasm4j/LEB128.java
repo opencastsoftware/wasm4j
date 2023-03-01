@@ -2,29 +2,33 @@ package com.opencastsoftware.wasm4j;
 
 import java.io.ByteArrayOutputStream;
 
-public interface LEB128 {
-    static void writeUnsigned(ByteArrayOutputStream out, int i) {
+public class LEB128 {
+    private static final byte LOW_7_BITS = 0x7F;
+    private static final int CONTINUATION_BIT = 0x80;
+    private static final byte SIGN_BIT = 0x40;
+
+    public static final void writeUnsigned(ByteArrayOutputStream out, long i) {
         while (true) {
-            if (i < 0x80) {
-                out.write((byte) (i & 0x7F));
+            if (i < CONTINUATION_BIT) {
+                out.write((byte) (i & LOW_7_BITS));
                 break;
             } else {
-                out.write((byte) (i & 0x7F | 0x80));
+                out.write((byte) (i & LOW_7_BITS | CONTINUATION_BIT));
                 i >>>= 7;
             }
         }
     }
 
-    static int readUnsigned(byte[] in) {
+    public static final int readUnsignedInt(byte[] in) {
         int result = 0;
         int shift = 0;
 
         for (byte value : in) {
-            if ((value & 0x80) == 0) {
-                result |= (((byte) value) << shift);
+            if ((value & CONTINUATION_BIT) == 0) {
+                result |= ((int) value << shift);
                 break;
             } else {
-                result |= (((byte) (value & 0x7F)) << shift);
+                result |= (((int) (value & LOW_7_BITS)) << shift);
             }
             shift += 7;
         }
@@ -32,37 +36,82 @@ public interface LEB128 {
         return result;
     }
 
-    static void writeSigned(ByteArrayOutputStream out, int input) {
-        while (true) {
-            byte byteValue = (byte) (input & 0x7F);
-            input >>= 7;
-            if ((input == 0 && (byteValue & 0x40) == 0) ||
-                    (input == -1 && (byteValue & 0x40) != 0)) {
-                out.write(byteValue);
+    public static final long readUnsignedLong(byte[] in) {
+        long result = 0;
+        int shift = 0;
+
+        for (byte value : in) {
+            if ((value & CONTINUATION_BIT) == 0) {
+                result |= ((long) value << shift);
                 break;
             } else {
-                out.write(byteValue | 0x80);
+                result |= (((long) (value & LOW_7_BITS)) << shift);
+            }
+            shift += 7;
+        }
+
+        return result;
+    }
+
+    public static final void writeSigned(ByteArrayOutputStream out, long longValue) {
+        while (true) {
+            byte byteValue = (byte) (((byte) longValue) & LOW_7_BITS);
+            longValue >>= 7;
+
+            boolean more = !((longValue == 0 && ((byteValue & SIGN_BIT) == 0)) ||
+                    (longValue == -1 && ((byteValue & SIGN_BIT) != 0)));
+
+            if (more) {
+                byteValue |= CONTINUATION_BIT;
+            }
+
+            out.write(byteValue);
+
+            if (!more) {
+                break;
             }
         }
     }
 
-    static int readSigned(byte[] in) {
+    public static final int readSignedInt(byte[] in) {
         int result = 0;
         int shift = 0;
         byte value = 0;
 
         for (int i = 0; i < in.length; i++) {
             value = in[i];
-            result |= (((byte) (value & 0x7F)) << shift);
+            result |= (((int) (value & LOW_7_BITS)) << shift);
             shift += 7;
 
-            if ((value & 0x80) == 0) {
+            if ((value & CONTINUATION_BIT) == 0) {
                 break;
             }
         }
 
-        if (shift < Integer.SIZE && (value & 0x40) != 0) {
+        if (shift < Integer.SIZE && (value & SIGN_BIT) != 0) {
             result |= (~0 << shift);
+        }
+
+        return result;
+    }
+
+    public static final long readSignedLong(byte[] in) {
+        long result = 0L;
+        int shift = 0;
+        byte value = 0;
+
+        for (int i = 0; i < in.length; i++) {
+            value = in[i];
+            result |= (((long) (value & LOW_7_BITS)) << shift);
+            shift += 7;
+
+            if ((value & CONTINUATION_BIT) == 0) {
+                break;
+            }
+        }
+
+        if (shift < Long.SIZE && ((value & SIGN_BIT) != 0)) {
+            result |= (~0L << shift);
         }
 
         return result;

@@ -254,13 +254,13 @@ public enum Opcode {
     // RESERVED((byte) 0xFA),
     // RESERVED((byte) 0xFB),
     // FC Extensions
-    I32_TRUNC_SAT_F32_S(new byte[] { (byte) 0xFC, (byte) 0x00 }), 
+    I32_TRUNC_SAT_F32_S(new byte[] { (byte) 0xFC, (byte) 0x00 }),
     I32_TRUNC_SAT_F32_U(new byte[] { (byte) 0xFC, (byte) 0x01 }),
-    I32_TRUNC_SAT_F64_S(new byte[] { (byte) 0xFC, (byte) 0x02 }), 
+    I32_TRUNC_SAT_F64_S(new byte[] { (byte) 0xFC, (byte) 0x02 }),
     I32_TRUNC_SAT_F64_U(new byte[] { (byte) 0xFC, (byte) 0x03 }),
-    I64_TRUNC_SAT_F32_S(new byte[] { (byte) 0xFC, (byte) 0x04 }), 
+    I64_TRUNC_SAT_F32_S(new byte[] { (byte) 0xFC, (byte) 0x04 }),
     I64_TRUNC_SAT_F32_U(new byte[] { (byte) 0xFC, (byte) 0x05 }),
-    I64_TRUNC_SAT_F64_S(new byte[] { (byte) 0xFC, (byte) 0x06 }), 
+    I64_TRUNC_SAT_F64_S(new byte[] { (byte) 0xFC, (byte) 0x06 }),
     I64_TRUNC_SAT_F64_U(new byte[] { (byte) 0xFC, (byte) 0x07 }),
     MEMORY_INIT(new byte[] { (byte) 0xFC, (byte) 0x08 }),
     DATA_DROP(new byte[] { (byte) 0xFC, (byte) 0x09 }),
@@ -509,10 +509,9 @@ public enum Opcode {
     I32X4_TRUNC_SAT_F64X2_U_ZERO(new byte[] { (byte) 0xFD, (byte) 0xFD, (byte) 0x01 }),
     F64X2_CONVERT_LOW_I32X4_S(new byte[] { (byte) 0xFD, (byte) 0xFE, (byte) 0x01 }),
     F64X2_CONVERT_LOW_I32X4_U(new byte[] { (byte) 0xFD, (byte) 0xFF, (byte) 0x01 }),
-    // tbc
     ;
 
-    private byte[] bytes;
+    private final byte[] bytes;
 
     Opcode(byte[] bytes) {
         this.bytes = bytes;
