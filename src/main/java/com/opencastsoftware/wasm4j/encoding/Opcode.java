@@ -1,4 +1,4 @@
-package com.opencastsoftware.wasm4j;
+package com.opencastsoftware.wasm4j.encoding;
 
 public enum Opcode {
     UNREACHABLE((byte) 0x00),
@@ -21,7 +21,7 @@ public enum Opcode {
     CALL_INDIRECT((byte) 0x11),
     // RESERVED((byte) 0x12),
     // RESERVED((byte) 0x13),
-    // RESERVED((byte) 0x14),
+    CALL_REF((byte) 0x14),
     // RESERVED((byte) 0x15),
     // RESERVED((byte) 0x16),
     // RESERVED((byte) 0x17),
@@ -212,10 +212,10 @@ public enum Opcode {
     REF_NULL((byte) 0xD0),
     REF_IS_NULL((byte) 0xD1),
     REF_FUNC((byte) 0xD2),
-    // RESERVED((byte) 0xD3),
-    // RESERVED((byte) 0xD4),
+    REF_AS_NON_NULL((byte) 0xD3),
+    BR_ON_NULL((byte) 0xD4),
     // RESERVED((byte) 0xD5),
-    // RESERVED((byte) 0xD6),
+    BR_ON_NON_NULL((byte) 0xD6),
     // RESERVED((byte) 0xD7),
     // RESERVED((byte) 0xD8),
     // RESERVED((byte) 0xD9),

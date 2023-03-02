@@ -1,4 +1,4 @@
-package com.opencastsoftware.wasm4j;
+package com.opencastsoftware.wasm4j.encoding;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -6,8 +6,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
 
 import net.jqwik.api.Example;
+import net.jqwik.api.constraints.BigRange;
 import org.junit.jupiter.api.Test;
 
 import net.jqwik.api.ForAll;
@@ -51,18 +53,18 @@ public class LEB128Test {
     }
 
     @Property
-    void roundTripUnsignedInt(@ForAll @IntRange(min = 0, max = Integer.MAX_VALUE) int input) {
-        var baos = new ByteArrayOutputStream();
-        LEB128.writeUnsigned(baos, input);
-        var actual = LEB128.readUnsignedInt(baos.toByteArray());
-        assertThat(actual, is(equalTo(input)));
-    }
-
-    @Property
     void roundTripUnsignedLong(@ForAll @LongRange(min = 0, max = Long.MAX_VALUE) long input) {
         var baos = new ByteArrayOutputStream();
         LEB128.writeUnsigned(baos, input);
         var output = LEB128.readUnsignedLong(baos.toByteArray());
+        assertThat(output, is(input));
+    }
+
+    @Property
+    void roundTripBigInt(@ForAll @BigRange(min = "0", max = "18446744073709551615") BigInteger input) {
+        var baos = new ByteArrayOutputStream();
+        LEB128.writeUnsigned(baos, input);
+        var output = LEB128.readUnsignedBigInt(baos.toByteArray());
         assertThat(output, is(input));
     }
 
