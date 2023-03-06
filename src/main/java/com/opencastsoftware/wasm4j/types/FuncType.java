@@ -18,4 +18,9 @@ public class FuncType implements ExternType {
     public List<ValType> results() {
         return results;
     }
+
+    @Override
+    public <T extends Exception> void accept(WasmTypeVisitor<T> visitor) throws T {
+        visitor.visitFuncType(this);
+    }
 }

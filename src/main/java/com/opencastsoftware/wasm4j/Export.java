@@ -13,32 +13,31 @@ public class Export {
     public Descriptor descriptor() { return descriptor; }
 
     public static class Descriptor {
-        private final long index;
+        private final int index;
         private final IndexType indexType;
 
-        public static Descriptor func(long index) {
+        public static Descriptor func(int index) {
             return new Descriptor(index, IndexType.FUNC);
         }
 
-        public static Descriptor table(long index) {
+        public static Descriptor table(int index) {
             return new Descriptor(index, IndexType.TABLE);
         }
 
-        public static Descriptor mem(long index) {
+        public static Descriptor mem(int index) {
             return new Descriptor(index, IndexType.MEM);
         }
 
-        public static Descriptor global(long index) {
+        public static Descriptor global(int index) {
             return new Descriptor(index, IndexType.GLOBAL);
         }
 
-        public Descriptor(long index, IndexType indexType) {
-            Preconditions.checkValidU32("index", index);
+        public Descriptor(int index, IndexType indexType) {
             this.index = index;
             this.indexType = indexType;
         }
 
-        public long index() {
+        public int index() {
             return index;
         }
 

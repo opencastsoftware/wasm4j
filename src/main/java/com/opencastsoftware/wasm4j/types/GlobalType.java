@@ -24,4 +24,9 @@ public class GlobalType implements ExternType {
     public static GlobalType immutable(ValType valType) {
         return new GlobalType(false, valType);
     }
+
+    @Override
+    public <T extends Exception> void accept(WasmTypeVisitor<T> visitor) throws T {
+        visitor.visitGlobalType(this);
+    }
 }

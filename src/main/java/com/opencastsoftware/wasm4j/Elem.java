@@ -33,7 +33,7 @@ public class Elem {
             return Passive.INSTANCE;
         }
 
-        static Active active(long tableIndex, List<ConstantInstruction> offset) {
+        static Active active(int tableIndex, List<ConstantInstruction> offset) {
             return new Active(tableIndex, offset);
         }
 
@@ -49,17 +49,16 @@ public class Elem {
             INSTANCE;
         }
 
-        class Active {
-            private final long tableIndex;
+        class Active implements Mode {
+            private final int tableIndex;
             private final List<ConstantInstruction> offset;
 
-            public Active(long tableIndex, List<ConstantInstruction> offset) {
-                Preconditions.checkValidU32("tableIndex", tableIndex);
+            public Active(int tableIndex, List<ConstantInstruction> offset) {
                 this.tableIndex = tableIndex;
                 this.offset = offset;
             }
 
-            public long tableIndex() {
+            public int tableIndex() {
                 return tableIndex;
             }
 

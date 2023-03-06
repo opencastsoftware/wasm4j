@@ -14,15 +14,13 @@ import com.opencastsoftware.wasm4j.instructions.numeric.integer.test.I32Eqz;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.test.I64Eqz;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.unary.*;
 
-import java.math.BigInteger;
-
 public interface NumericInstruction extends Instruction {
     // Integer constant operations
-    static I32Const i32_const(long value) {
+    static I32Const i32_const(int value) {
         return new I32Const(value);
     }
 
-    static I64Const i64_const(BigInteger value) {
+    static I64Const i64_const(long value) {
         return new I64Const(value);
     }
 

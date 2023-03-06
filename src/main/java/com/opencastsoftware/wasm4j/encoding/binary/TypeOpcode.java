@@ -1,4 +1,4 @@
-package com.opencastsoftware.wasm4j.encoding;
+package com.opencastsoftware.wasm4j.encoding.binary;
 
 public enum TypeOpcode {
     I32((byte) 0x7F),
@@ -15,7 +15,8 @@ public enum TypeOpcode {
     // 0x6A .. 0x61 reserved
     FUNC((byte) 0x60),
     // 0x5F .. 0x41 reserved
-    RESULT((byte) 0x40)
+    // Apparently unused
+    // RESULT((byte) 0x40)
     ;
 
     private final byte opcode;

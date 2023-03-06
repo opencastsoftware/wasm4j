@@ -1,20 +1,16 @@
 package com.opencastsoftware.wasm4j.instructions.numeric.integer;
 
-import com.opencastsoftware.wasm4j.Preconditions;
 import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
 import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
 
-import java.math.BigInteger;
-
 public class I64Const implements NumericInstruction, ConstantInstruction {
-    private final BigInteger value;
+    private final long value;
 
-    public I64Const(BigInteger value) {
-        Preconditions.checkValidU64("value", value);
+    public I64Const(long value) {
         this.value = value;
     }
 
-    public BigInteger value() {
+    public long value() {
         return value;
     }
 }

@@ -1,4 +1,4 @@
-package com.opencastsoftware.wasm4j.encoding;
+package com.opencastsoftware.wasm4j.encoding.binary;
 
 public enum Opcode {
     UNREACHABLE((byte) 0x00),

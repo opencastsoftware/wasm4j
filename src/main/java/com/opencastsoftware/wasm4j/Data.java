@@ -18,24 +18,24 @@ public class Data {
             return Passive.INSTANCE;
         }
 
-        static Active active(long memIndex, List<ConstantInstruction> offset) {
+        static Active active(int memIndex, List<ConstantInstruction> offset) {
             return new Active(memIndex, offset);
         }
 
-        enum Passive {
+        enum Passive implements Mode {
             INSTANCE;
         }
 
-        class Active {
-            private final long memIndex;
+        class Active implements Mode {
+            private final int memIndex;
             private final List<ConstantInstruction> offset;
 
-            public Active(long memIndex, List<ConstantInstruction> offset) {
+            public Active(int memIndex, List<ConstantInstruction> offset) {
                 this.memIndex = memIndex;
                 this.offset = offset;
             }
 
-            public long memIndex() {
+            public int memIndex() {
                 return memIndex;
             }
 

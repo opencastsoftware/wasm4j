@@ -8,7 +8,7 @@ public interface ReferenceInstruction extends Instruction {
         return new RefNull(heapType);
     }
 
-    static RefFunc ref_func(long funcIndex) {
+    static RefFunc ref_func(int funcIndex) {
         return new RefFunc(funcIndex);
     }
 

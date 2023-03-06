@@ -14,11 +14,11 @@ public class Module {
     private final List<Global> globals;
     private final List<Elem> elems;
     private final List<Data> datas;
-    private final Long start;
+    private final Integer start;
     private final List<Import> imports;
     private final List<Export> exports;
 
-    public Module(List<FuncType> types, List<Func> funcs, List<Table> tables, List<MemType> mems, List<Global> globals, List<Elem> elems, List<Data> datas, Long start, List<Import> imports, List<Export> exports) {
+    public Module(List<FuncType> types, List<Func> funcs, List<Table> tables, List<MemType> mems, List<Global> globals, List<Elem> elems, List<Data> datas, Integer start, List<Import> imports, List<Export> exports) {
         this.types = types;
         this.funcs = funcs;
         this.tables = tables;
@@ -76,7 +76,7 @@ public class Module {
         return datas;
     }
 
-    public Long start() {
+    public Integer start() {
         return start;
     }
 

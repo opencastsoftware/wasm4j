@@ -16,4 +16,9 @@ public class TableType implements ExternType {
     public RefType refType() {
         return refType;
     }
+
+    @Override
+    public <T extends Exception> void accept(WasmTypeVisitor<T> visitor) throws T {
+        visitor.visitTableType(this);
+    }
 }

@@ -1,32 +1,38 @@
 package com.opencastsoftware.wasm4j.types;
 
-import com.opencastsoftware.wasm4j.Preconditions;
+public class Limits implements WasmType {
+    private final int min;
 
-import java.util.Optional;
+    private final Integer max;
 
-public class Limits {
-    private final long min;
-
-    private final Long max;
-
-    public Limits(long min, long max) {
-        Preconditions.checkValidU32("min", min);
-        Preconditions.checkValidU32("max", max);
+    public Limits(int min, int max) {
         this.min = min;
         this.max = max;
     }
 
-    public Limits(long min) {
-        Preconditions.checkValidU32("min", min);
+    public Limits(int min) {
         this.min = min;
         this.max = null;
     }
 
-    public long min() {
+    public int min() {
         return min;
     }
 
-    public Long max() {
+    public Integer max() {
         return max;
+    }
+
+    public static Limits of(int min) {
+        return new Limits(min);
+    }
+
+    public static Limits of(int min, int max) {
+        return new Limits(min, max);
+    }
+
+    @Override
+    public <T extends Exception> void accept(WasmTypeVisitor<T> visitor) throws T {
+        visitor.visitLimits(this);
     }
 }

@@ -9,7 +9,7 @@ public interface HeapType extends WasmType {
         return HeapExternType.INSTANCE;
     }
 
-    static TypeId typeId(long typeIndex) {
+    static TypeId typeId(int typeIndex) {
         return new TypeId(typeIndex);
     }
 }

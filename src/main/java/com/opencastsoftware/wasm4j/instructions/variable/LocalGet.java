@@ -1,13 +1,13 @@
 package com.opencastsoftware.wasm4j.instructions.variable;
 
 public class LocalGet {
-    private final long localIndex;
+    private final int localIndex;
 
-    public LocalGet(long localIndex) {
+    public LocalGet(int localIndex) {
         this.localIndex = localIndex;
     }
 
-    public long localIndex() {
+    public int localIndex() {
         return localIndex;
     }
 }

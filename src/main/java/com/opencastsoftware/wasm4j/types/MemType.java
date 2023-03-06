@@ -10,4 +10,9 @@ public class MemType implements ExternType {
     public Limits limits() {
         return limits;
     }
+
+    @Override
+    public <T extends Exception> void accept(WasmTypeVisitor<T> visitor) throws T {
+        visitor.visitMemType(this);
+    }
 }

@@ -24,4 +24,9 @@ public class RefType implements ValType {
     public static RefType nonNullable(HeapType heapType) {
         return new RefType(false, heapType);
     }
+
+    @Override
+    public <T extends Exception> void accept(WasmTypeVisitor<T> visitor) throws T {
+        visitor.visitRefType(this);
+    }
 }

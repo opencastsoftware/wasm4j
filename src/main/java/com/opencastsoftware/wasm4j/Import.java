@@ -28,7 +28,7 @@ public class Import {
     }
 
     public interface Descriptor {
-        static Func func(long funcIndex) {
+        static Func func(int funcIndex) {
             return new Func(funcIndex);
         }
 
@@ -45,13 +45,13 @@ public class Import {
         }
 
         class Func implements Descriptor {
-            private final long funcIndex;
+            private final int funcIndex;
 
-            public Func(long funcIndex) {
+            public Func(int funcIndex) {
                 this.funcIndex = funcIndex;
             }
 
-            public long funcIndex() {
+            public int funcIndex() {
                 return funcIndex;
             }
         }
