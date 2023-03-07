@@ -108,6 +108,11 @@ public class WasmBinaryEncoder implements WasmEncoder {
         if (!tables.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
 
+            LEB128.writeUnsigned(intermediate, tables.size());
+            for (Table table: tables) {
+                // TODO: Needs expression encoding for initialization
+            }
+
             encodeSection(output, SectionId.TABLE, intermediate.toByteArray());
         }
     }
@@ -116,6 +121,12 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeMemories(OutputStream output, List<MemType> mems) throws IOException {
         if (!mems.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
+            var visitor = new WasmTypeBinaryEncodingVisitor(intermediate);
+
+            LEB128.writeUnsigned(intermediate, mems.size());
+            for (MemType mem : mems) {
+                visitor.visitMemType(mem);
+            }
 
             encodeSection(output, SectionId.MEMORY, intermediate.toByteArray());
         }
@@ -126,16 +137,46 @@ public class WasmBinaryEncoder implements WasmEncoder {
         if (!globals.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
 
+            LEB128.writeUnsigned(intermediate, globals.size());
+            for (Global global : globals) {
+                // TODO: Needs expression encoding for initialization
+            }
+
             encodeSection(output, SectionId.GLOBAL, intermediate.toByteArray());
         }
     }
 
+    private void encodeExportDescriptor(OutputStream output, Export.Descriptor descriptor) throws IOException {
+        switch (descriptor.indexType()) {
+            case FUNC:
+                output.write(0x00);
+                break;
+            case TABLE:
+                output.write(0x01);
+                break;
+            case MEM:
+                output.write(0x02);
+                break;
+            case GLOBAL:
+                output.write(0x03);
+                break;
+        }
+
+        LEB128.writeUnsigned(output, descriptor.index());
+    }
+
     @Override
-    public void encodeExports(OutputStream output, List<Export> imports) throws IOException {
-        if (!imports.isEmpty()) {
+    public void encodeExports(OutputStream output, List<Export> exports) throws IOException {
+        if (!exports.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
 
-            encodeSection(output, SectionId.IMPORT, intermediate.toByteArray());
+            LEB128.writeUnsigned(intermediate, exports.size());
+            for (Export export : exports) {
+                encodeString(intermediate, export.name());
+                encodeExportDescriptor(intermediate, export.descriptor());
+            }
+
+            encodeSection(output, SectionId.EXPORT, intermediate.toByteArray());
         }
     }
 
@@ -153,6 +194,11 @@ public class WasmBinaryEncoder implements WasmEncoder {
         if (!elems.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
 
+            LEB128.writeUnsigned(intermediate, elems.size());
+            for (Elem elem : elems) {
+                // TODO: Needs expression encoding for initialization
+            }
+
             encodeSection(output, SectionId.ELEMENT, intermediate.toByteArray());
         }
     }
@@ -169,6 +215,11 @@ public class WasmBinaryEncoder implements WasmEncoder {
         if (!funcs.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
 
+            LEB128.writeUnsigned(intermediate, funcs.size());
+            for (Func func : funcs) {
+                // TODO: Needs expression encoding visitor
+            }
+
             encodeSection(output, SectionId.CODE, intermediate.toByteArray());
         }
     }
@@ -177,6 +228,11 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeData(OutputStream output, List<Data> datas) throws IOException {
         if (!datas.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
+
+            LEB128.writeUnsigned(intermediate, datas.size());
+            for (Data data : datas) {
+                // TODO: Needs expression encoding for initialization
+            }
 
             encodeSection(output, SectionId.DATA, intermediate.toByteArray());
         }

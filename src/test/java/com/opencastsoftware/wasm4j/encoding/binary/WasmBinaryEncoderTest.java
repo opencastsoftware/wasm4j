@@ -1,9 +1,7 @@
 package com.opencastsoftware.wasm4j.encoding.binary;
 
-import com.opencastsoftware.wasm4j.Data;
-import com.opencastsoftware.wasm4j.Func;
-import com.opencastsoftware.wasm4j.Import;
 import com.opencastsoftware.wasm4j.Module;
+import com.opencastsoftware.wasm4j.*;
 import com.opencastsoftware.wasm4j.types.*;
 import org.junit.jupiter.api.Test;
 
@@ -177,6 +175,30 @@ class WasmBinaryEncoderTest {
     }
 
     @Test
+    void testEncodeMemories() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeMemories(output, List.of(
+                ExternType.mem(Limits.of(1)),
+                ExternType.mem(Limits.of(1, 5))
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.MEMORY.id(),
+                // Section size (LEB128 u32)
+                0x06,
+                // Memories vec length (LEB128 u32)
+                0x02,
+                // Entry 1
+                0x00, 0x01, // Limits
+                // Entry 2
+                0x01, 0x01, 0x05, // Limits
+        }, output.toByteArray());
+    }
+
+    @Test
     void testEncodeEmptyGlobals() throws IOException {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();
@@ -190,6 +212,48 @@ class WasmBinaryEncoderTest {
         var output = new ByteArrayOutputStream();
         encoder.encodeExports(output, Collections.emptyList());
         assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeExports() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeExports(output, List.of(
+                new Export("a", Export.Descriptor.func(0)),
+                new Export("b", Export.Descriptor.table(1)),
+                new Export("c", Export.Descriptor.mem(2)),
+                new Export("d", Export.Descriptor.global(3))
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.EXPORT.id(),
+                // Section size (LEB128 u32)
+                0x11,
+                // Exports vec length (LEB128 u32)
+                0x04,
+                // Entry 1
+                0x01, // Export name length
+                0x61, // "a"
+                0x00, // funcidx
+                0x00, // Function index 0 (LEB128 u32)
+                // Entry 2
+                0x01, // Export name length
+                0x62, // "b"
+                0x01, // tableidx
+                0x01, // Table index 1 (LEB128 u32)
+                // Entry 3
+                0x01, // Export name length
+                0x63, // "c"
+                0x02, // memidx
+                0x02, // Memory index 2 (LEB128 u32)
+                // Entry 3
+                0x01, // Export name length
+                0x64, // "d"
+                0x03, // globalidx
+                0x03  // Global index 3 (LEB128 u32)
+        }, output.toByteArray());
     }
 
     @Test
