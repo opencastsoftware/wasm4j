@@ -7,9 +7,9 @@ import java.util.List;
 
 public class Table {
     private final TableType type;
-    private final List<ConstantInstruction> init;
+    private final ConstantExpression init;
 
-    public Table(TableType type, List<ConstantInstruction> init) {
+    public Table(TableType type, ConstantExpression init) {
         this.type = type;
         this.init = init;
     }
@@ -18,7 +18,7 @@ public class Table {
         return type;
     }
 
-    public List<ConstantInstruction> init() {
+    public ConstantExpression init() {
         return init;
     }
 }

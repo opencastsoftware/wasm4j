@@ -1,6 +1,7 @@
 package com.opencastsoftware.wasm4j.instructions.numeric.floating;
 
 import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
+import com.opencastsoftware.wasm4j.instructions.ConstantInstructionVisitor;
 import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
 
 public class F64Const implements NumericInstruction, ConstantInstruction {
@@ -12,5 +13,10 @@ public class F64Const implements NumericInstruction, ConstantInstruction {
 
     public double value() {
         return value;
+    }
+
+    @Override
+    public <T extends Exception> void accept(ConstantInstructionVisitor<T> visitor) throws T {
+        visitor.visitF64Const(this);
     }
 }

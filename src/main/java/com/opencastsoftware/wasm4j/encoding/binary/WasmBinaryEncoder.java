@@ -5,6 +5,7 @@ import com.opencastsoftware.wasm4j.*;
 import com.opencastsoftware.wasm4j.encoding.WasmEncoder;
 import com.opencastsoftware.wasm4j.types.FuncType;
 import com.opencastsoftware.wasm4j.types.MemType;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -110,7 +111,6 @@ public class WasmBinaryEncoder implements WasmEncoder {
 
             LEB128.writeUnsigned(intermediate, tables.size());
             for (Table table: tables) {
-                // TODO: Needs expression encoding for initialization
             }
 
             encodeSection(output, SectionId.TABLE, intermediate.toByteArray());
@@ -181,7 +181,7 @@ public class WasmBinaryEncoder implements WasmEncoder {
     }
 
     @Override
-    public void encodeStart(OutputStream output, Integer start) throws IOException {
+    public void encodeStart(OutputStream output, @Nullable Integer start) throws IOException {
         if (start != null) {
             var intermediate = new ByteArrayOutputStream();
             LEB128.writeUnsigned(intermediate, start);

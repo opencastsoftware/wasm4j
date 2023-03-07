@@ -1,8 +1,11 @@
 package com.opencastsoftware.wasm4j.types;
 
+import org.jetbrains.annotations.Nullable;
+
 public class Limits implements WasmType {
     private final int min;
 
+    @Nullable
     private final Integer max;
 
     public Limits(int min, int max) {
@@ -19,6 +22,7 @@ public class Limits implements WasmType {
         return min;
     }
 
+    @Nullable
     public Integer max() {
         return max;
     }

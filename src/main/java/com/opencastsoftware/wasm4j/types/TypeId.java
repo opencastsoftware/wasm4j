@@ -1,6 +1,6 @@
 package com.opencastsoftware.wasm4j.types;
 
-public class TypeId implements HeapType {
+public class TypeId implements HeapType, BlockType {
     private final int typeIndex;
 
     public TypeId(int typeIndex) {

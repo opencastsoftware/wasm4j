@@ -1,6 +1,7 @@
 package com.opencastsoftware.wasm4j.instructions.numeric.integer;
 
 import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
+import com.opencastsoftware.wasm4j.instructions.ConstantInstructionVisitor;
 import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
 
 public class I32Const implements NumericInstruction, ConstantInstruction {
@@ -12,5 +13,10 @@ public class I32Const implements NumericInstruction, ConstantInstruction {
 
     public int value() {
         return value;
+    }
+
+    @Override
+    public <T extends Exception> void accept(ConstantInstructionVisitor<T> visitor) throws T {
+        visitor.visitI32Const(this);
     }
 }

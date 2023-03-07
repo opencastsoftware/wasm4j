@@ -7,10 +7,10 @@ import java.util.List;
 
 public class Elem {
     private final RefType type;
-    private final List<List<ConstantInstruction>> init;
+    private final List<ConstantExpression> init;
     private final Mode elemMode;
 
-    public Elem(RefType type, List<List<ConstantInstruction>> init, Mode elemMode) {
+    public Elem(RefType type, List<ConstantExpression> init, Mode elemMode) {
         this.type = type;
         this.init = init;
         this.elemMode = elemMode;
@@ -20,7 +20,7 @@ public class Elem {
         return type;
     }
 
-    public List<List<ConstantInstruction>> init() {
+    public List<ConstantExpression> init() {
         return init;
     }
 
@@ -33,7 +33,7 @@ public class Elem {
             return Passive.INSTANCE;
         }
 
-        static Active active(int tableIndex, List<ConstantInstruction> offset) {
+        static Active active(int tableIndex, ConstantExpression offset) {
             return new Active(tableIndex, offset);
         }
 
@@ -51,9 +51,9 @@ public class Elem {
 
         class Active implements Mode {
             private final int tableIndex;
-            private final List<ConstantInstruction> offset;
+            private final ConstantExpression offset;
 
-            public Active(int tableIndex, List<ConstantInstruction> offset) {
+            public Active(int tableIndex, ConstantExpression offset) {
                 this.tableIndex = tableIndex;
                 this.offset = offset;
             }
@@ -62,7 +62,7 @@ public class Elem {
                 return tableIndex;
             }
 
-            public List<ConstantInstruction> offset() {
+            public ConstantExpression offset() {
                 return offset;
             }
         }

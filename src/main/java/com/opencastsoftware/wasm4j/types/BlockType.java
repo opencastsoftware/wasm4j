@@ -1,5 +1,4 @@
 package com.opencastsoftware.wasm4j.types;
 
-public interface ValType extends BlockType {
-
+public interface BlockType extends WasmType {
 }

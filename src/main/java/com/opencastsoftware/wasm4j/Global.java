@@ -7,9 +7,9 @@ import java.util.List;
 
 public class Global {
     private final GlobalType type;
-    private final List<ConstantInstruction> init;
+    private final ConstantExpression init;
 
-    public Global(GlobalType type, List<ConstantInstruction> init) {
+    public Global(GlobalType type, ConstantExpression init) {
         this.type = type;
         this.init = init;
     }
@@ -18,7 +18,7 @@ public class Global {
         return type;
     }
 
-    public List<ConstantInstruction> init() {
+    public ConstantExpression init() {
         return init;
     }
 }

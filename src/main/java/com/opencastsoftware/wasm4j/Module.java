@@ -2,6 +2,7 @@ package com.opencastsoftware.wasm4j;
 
 import com.opencastsoftware.wasm4j.types.FuncType;
 import com.opencastsoftware.wasm4j.types.MemType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +15,12 @@ public class Module {
     private final List<Global> globals;
     private final List<Elem> elems;
     private final List<Data> datas;
+    @Nullable
     private final Integer start;
     private final List<Import> imports;
     private final List<Export> exports;
 
-    public Module(List<FuncType> types, List<Func> funcs, List<Table> tables, List<MemType> mems, List<Global> globals, List<Elem> elems, List<Data> datas, Integer start, List<Import> imports, List<Export> exports) {
+    public Module(List<FuncType> types, List<Func> funcs, List<Table> tables, List<MemType> mems, List<Global> globals, List<Elem> elems, List<Data> datas, @Nullable Integer start, List<Import> imports, List<Export> exports) {
         this.types = types;
         this.funcs = funcs;
         this.tables = tables;
@@ -76,6 +78,7 @@ public class Module {
         return datas;
     }
 
+    @Nullable
     public Integer start() {
         return start;
     }

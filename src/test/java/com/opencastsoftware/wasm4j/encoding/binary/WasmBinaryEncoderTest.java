@@ -137,9 +137,9 @@ class WasmBinaryEncoderTest {
         var output = new ByteArrayOutputStream();
 
         encoder.encodeFunctions(output, List.of(
-                new Func(0, Collections.emptyList(), Collections.emptyList()),
-                new Func(1, Collections.emptyList(), Collections.emptyList()),
-                new Func(2, Collections.emptyList(), Collections.emptyList())
+                new Func(0, Collections.emptyList(), Expression.empty()),
+                new Func(1, Collections.emptyList(), Expression.empty()),
+                new Func(2, Collections.emptyList(), Expression.empty())
         ));
 
         assertArrayEquals(new byte[]{

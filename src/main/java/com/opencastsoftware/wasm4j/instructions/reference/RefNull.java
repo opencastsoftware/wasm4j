@@ -1,8 +1,10 @@
 package com.opencastsoftware.wasm4j.instructions.reference;
 
+import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
+import com.opencastsoftware.wasm4j.instructions.ConstantInstructionVisitor;
 import com.opencastsoftware.wasm4j.types.HeapType;
 
-public class RefNull implements ReferenceInstruction {
+public class RefNull implements ReferenceInstruction, ConstantInstruction {
     private HeapType heapType;
 
     public RefNull(HeapType heapType) {
@@ -11,5 +13,10 @@ public class RefNull implements ReferenceInstruction {
 
     public HeapType heapType() {
         return heapType;
+    }
+
+    @Override
+    public <T extends Exception> void accept(ConstantInstructionVisitor<T> visitor) throws T {
+        visitor.visitRefNull(this);
     }
 }

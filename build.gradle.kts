@@ -11,6 +11,7 @@ java {
 }
 
 dependencies {
+    compileOnly(libs.jetBrainsAnnotations)
     testImplementation(libs.junitJupiter)
     testImplementation(libs.hamcrest)
     testImplementation(libs.jqwik)

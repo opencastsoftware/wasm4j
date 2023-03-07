@@ -8,9 +8,9 @@ import java.util.List;
 public class Func {
     private final int typeIndex;
     private final List<ValType> locals;
-    private final List<Instruction> body;
+    private final Expression body;
 
-    public Func(int typeIndex, List<ValType> locals, List<Instruction> body) {
+    public Func(int typeIndex, List<ValType> locals, Expression body) {
         this.typeIndex = typeIndex;
         this.locals = locals;
         this.body = body;
@@ -24,7 +24,7 @@ public class Func {
         return locals;
     }
 
-    public List<Instruction> body() {
+    public Expression body() {
         return body;
     }
 }

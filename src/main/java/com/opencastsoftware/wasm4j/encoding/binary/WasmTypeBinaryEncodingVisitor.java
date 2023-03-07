@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class WasmTypeBinaryEncodingVisitor implements WasmTypeVisitor<IOException> {
-    private OutputStream output;
+    private final OutputStream output;
 
     public WasmTypeBinaryEncodingVisitor(OutputStream output) {
         this.output = output;
