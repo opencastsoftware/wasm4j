@@ -41,11 +41,11 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeTypes(OutputStream output, List<FuncType> types) throws IOException {
         if (!types.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
-            var visitor = new WasmTypeBinaryEncodingVisitor(intermediate);
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(intermediate);
 
             LEB128.writeUnsigned(intermediate, types.size());
             for (FuncType type : types) {
-                visitor.visitFuncType(type);
+                typeVisitor.visitFuncType(type);
             }
 
             encodeSection(output, SectionId.TYPE, intermediate.toByteArray());
@@ -59,19 +59,19 @@ public class WasmBinaryEncoder implements WasmEncoder {
             LEB128.writeUnsigned(output, func.typeIndex());
         } else if (descriptor instanceof Import.Descriptor.Table) {
             var table = (Import.Descriptor.Table) descriptor;
-            var visitor = new WasmTypeBinaryEncodingVisitor(output);
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
             output.write(0x01);
-            visitor.visitTableType(table.tableType());
+            typeVisitor.visitTableType(table.tableType());
         } else if (descriptor instanceof Import.Descriptor.Mem) {
             var mem = (Import.Descriptor.Mem) descriptor;
-            var visitor = new WasmTypeBinaryEncodingVisitor(output);
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
             output.write(0x02);
-            visitor.visitMemType(mem.memType());
+            typeVisitor.visitMemType(mem.memType());
         } else if (descriptor instanceof Import.Descriptor.Global) {
             var global = (Import.Descriptor.Global) descriptor;
-            var visitor = new WasmTypeBinaryEncodingVisitor(output);
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
             output.write(0x03);
-            visitor.visitGlobalType(global.globalType());
+            typeVisitor.visitGlobalType(global.globalType());
         }
     }
 
@@ -90,13 +90,14 @@ public class WasmBinaryEncoder implements WasmEncoder {
             encodeSection(output, SectionId.IMPORT, intermediate.toByteArray());
         }
     }
+
     @Override
     public void encodeFunctions(OutputStream output, List<Func> funcs) throws IOException {
         if (!funcs.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
 
             LEB128.writeUnsigned(intermediate, funcs.size());
-            for (Func func: funcs) {
+            for (Func func : funcs) {
                 LEB128.writeUnsigned(intermediate, func.typeIndex());
             }
 
@@ -108,9 +109,21 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeTables(OutputStream output, List<Table> tables) throws IOException {
         if (!tables.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(intermediate);
+            var constExprVisitor = new ConstantInstructionBinaryEncodingVisitor(intermediate, typeVisitor);
 
             LEB128.writeUnsigned(intermediate, tables.size());
-            for (Table table: tables) {
+            for (Table table : tables) {
+                // TODO: Handle shorthand table declaration - needs instruction equals implementations
+                // if (table.type().refType().isNullable() &&
+                //         table.init().instructions().isEmpty()) {
+                //     table.type().accept(typeVisitor);
+                // } else {
+                intermediate.write(0x40);
+                intermediate.write(0x00);
+                table.type().accept(typeVisitor);
+                table.init().accept(constExprVisitor);
+                // }
             }
 
             encodeSection(output, SectionId.TABLE, intermediate.toByteArray());
@@ -121,11 +134,11 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeMemories(OutputStream output, List<MemType> mems) throws IOException {
         if (!mems.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
-            var visitor = new WasmTypeBinaryEncodingVisitor(intermediate);
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(intermediate);
 
             LEB128.writeUnsigned(intermediate, mems.size());
             for (MemType mem : mems) {
-                visitor.visitMemType(mem);
+                typeVisitor.visitMemType(mem);
             }
 
             encodeSection(output, SectionId.MEMORY, intermediate.toByteArray());
@@ -136,10 +149,13 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeGlobals(OutputStream output, List<Global> globals) throws IOException {
         if (!globals.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(intermediate);
+            var constExprVisitor = new ConstantInstructionBinaryEncodingVisitor(intermediate, typeVisitor);
 
             LEB128.writeUnsigned(intermediate, globals.size());
             for (Global global : globals) {
-                // TODO: Needs expression encoding for initialization
+                global.type().accept(typeVisitor);
+                global.init().accept(constExprVisitor);
             }
 
             encodeSection(output, SectionId.GLOBAL, intermediate.toByteArray());
@@ -196,7 +212,7 @@ public class WasmBinaryEncoder implements WasmEncoder {
 
             LEB128.writeUnsigned(intermediate, elems.size());
             for (Elem elem : elems) {
-                // TODO: Needs expression encoding for initialization
+
             }
 
             encodeSection(output, SectionId.ELEMENT, intermediate.toByteArray());
@@ -228,10 +244,39 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeData(OutputStream output, List<Data> datas) throws IOException {
         if (!datas.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(intermediate);
+            var constExprVisitor = new ConstantInstructionBinaryEncodingVisitor(intermediate, typeVisitor);
 
             LEB128.writeUnsigned(intermediate, datas.size());
             for (Data data : datas) {
-                // TODO: Needs expression encoding for initialization
+                // Could be replaced with a bitfield if more flags are added
+                int indicator;
+
+                if (data.mode() instanceof Data.Mode.Passive) {
+                    // The 1st bit of the indicator encodes whether this is a passive data segment.
+                    indicator = 0b01;
+                    LEB128.writeUnsigned(intermediate, indicator);
+
+                } else if (data.mode() instanceof Data.Mode.Active) {
+                    var active = (Data.Mode.Active) data.mode();
+
+                    if (active.memIndex() != 0) {
+                        // The 2nd bit of the indicator indicates whether there's an explicit
+                        // memory index for an active segment.
+                        indicator = 0b10;
+                        LEB128.writeUnsigned(intermediate, indicator);
+                        LEB128.writeUnsigned(intermediate, active.memIndex());
+                    } else {
+                        // In this case, we have an active segment with no explicit memory index.
+                        indicator = 0b00;
+                        LEB128.writeUnsigned(intermediate, indicator);
+                    }
+
+                    active.offset().accept(constExprVisitor);
+                }
+
+                LEB128.writeUnsigned(intermediate, data.init().length);
+                intermediate.write(data.init());
             }
 
             encodeSection(output, SectionId.DATA, intermediate.toByteArray());

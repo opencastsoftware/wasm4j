@@ -1,5 +1,6 @@
 package com.opencastsoftware.wasm4j.instructions;
 
+import com.opencastsoftware.wasm4j.ConstantExpression;
 import com.opencastsoftware.wasm4j.instructions.numeric.floating.F32Const;
 import com.opencastsoftware.wasm4j.instructions.numeric.floating.F64Const;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.I32Const;
@@ -26,4 +27,6 @@ public interface ConstantInstructionVisitor<T extends Exception> {
     void visitRefFunc(RefFunc refFunc) throws T;
 
     void visitGlobalGet(GlobalGet globalGet) throws T;
+
+    void visitConstantExpression(ConstantExpression constExpr) throws T;
 }

@@ -2,7 +2,11 @@ package com.opencastsoftware.wasm4j.encoding.binary;
 
 import com.opencastsoftware.wasm4j.Module;
 import com.opencastsoftware.wasm4j.*;
+import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
+import com.opencastsoftware.wasm4j.instructions.reference.ReferenceInstruction;
+import com.opencastsoftware.wasm4j.instructions.variable.VariableInstruction;
 import com.opencastsoftware.wasm4j.types.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -167,6 +171,40 @@ class WasmBinaryEncoderTest {
     }
 
     @Test
+    void testEncodeTables() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeTables(output, List.of(
+                new Table(
+                        ExternType.table(Limits.of(1), RefType.nullable(HeapType.func())),
+                        ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.func()))),
+                new Table(
+                        ExternType.table(Limits.of(1, 5), RefType.nonNullable(HeapType.typeId(1))),
+                        ConstantExpression.of(VariableInstruction.global_get(0)))
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.TABLE.id(),
+                // Section size (LEB128 u32)
+                0x14,
+                // Tables vec length (LEB128 u32)
+                0x02,
+                // Entry 1
+                0x40, 0x00, // Table definition prolog
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_FUNC.opcode(), // Nullable heap function reference type
+                0x00, 0x01, // Limits
+                Opcode.REF_NULL.opcode(), TypeOpcode.HEAP_FUNC.opcode(), Opcode.END.opcode(), // Initializer expression
+                // Entry 2
+                0x40, 0x00, // table definition prolog
+                TypeOpcode.REF.opcode(), 0x01, // Non-nullable index type
+                0x01, 0x01, 0x05, // Limits
+                Opcode.GLOBAL_GET.opcode(), 0x00, Opcode.END.opcode(), // Initializer expression
+        }, output.toByteArray());
+    }
+
+    @Test
     void testEncodeEmptyMemories() throws IOException {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();
@@ -204,6 +242,39 @@ class WasmBinaryEncoderTest {
         var output = new ByteArrayOutputStream();
         encoder.encodeGlobals(output, Collections.emptyList());
         assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeGlobals() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeGlobals(output, List.of(
+                new Global(GlobalType.mutable(NumType.i32()), ConstantExpression.of(NumericInstruction.i32_const(42))),
+                new Global(GlobalType.immutable(NumType.f64()), ConstantExpression.of(NumericInstruction.f64_const(3.14))),
+                new Global(GlobalType.mutable(RefType.nullable(HeapType.extern())), ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.extern())))
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.GLOBAL.id(),
+                // Section size (LEB128 u32)
+                0x18,
+                // Globals vec length (LEB128 u32)
+                0x03,
+                // Entry 1
+                TypeOpcode.I32.opcode(), 0x01, // var
+                Opcode.I32_CONST.opcode(), 0x2A, Opcode.END.opcode(),
+                // Entry 2
+                TypeOpcode.F64.opcode(), 0x00, // const
+                Opcode.F64_CONST.opcode(),
+                (byte) 0x1F, (byte) 0x85, (byte) 0xEB, (byte) 0x51,
+                (byte) 0xB8, (byte) 0x1E, (byte) 0x09, (byte) 0x40,
+                Opcode.END.opcode(),
+                // Entry 3
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_EXTERN.opcode(), 0x01, // var
+                Opcode.REF_NULL.opcode(), TypeOpcode.HEAP_EXTERN.opcode(), Opcode.END.opcode()
+        }, output.toByteArray());
     }
 
     @Test
@@ -265,6 +336,23 @@ class WasmBinaryEncoderTest {
     }
 
     @Test
+    void testEncodeStart() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeStart(output, 64);
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.START.id(),
+                // Section size (LEB128 u32)
+                0x01,
+                // Start function index (LEB128 u32)
+                0x40
+        }, output.toByteArray());
+    }
+
+    @Test
     void testEncodeEmptyElems() throws IOException {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();
@@ -314,6 +402,42 @@ class WasmBinaryEncoderTest {
         var output = new ByteArrayOutputStream();
         encoder.encodeData(output, Collections.emptyList());
         assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeData() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeData(output, List.of(
+                new Data(WasmBinaryEncoder.WASM_MAGIC, Data.Mode.passive()),
+                new Data(WasmBinaryEncoder.WASM_MAGIC, Data.Mode.active(0, ConstantExpression.of(NumericInstruction.i32_const(0)))),
+                new Data(WasmBinaryEncoder.WASM_MAGIC, Data.Mode.active(1, ConstantExpression.of(NumericInstruction.i32_const(1))))
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.DATA.id(),
+                // Section size (LEB128 u32)
+                0x1A,
+                // Data vec length (LEB128 u32)
+                0x03,
+                // Entry 1
+                0x01, // Passive data segment
+                0x04, // Data length
+                0x00, 0x61, 0x71, 0x6D, // Data
+                // Entry 2
+                0x00, // Active data segment without explicit memory index
+                Opcode.I32_CONST.opcode(), 0x00, Opcode.END.opcode(), // Offset expression
+                0x04, // Data length
+                0x00, 0x61, 0x71, 0x6D, // Data
+                // Entry 3
+                0x02, // Active data segment with explicit memory index
+                0x01, // Memory index
+                Opcode.I32_CONST.opcode(), 0x01, Opcode.END.opcode(), // Offset expression
+                0x04, // Data length
+                0x00, 0x61, 0x71, 0x6D, // Data
+        }, output.toByteArray());
     }
 
     @Test

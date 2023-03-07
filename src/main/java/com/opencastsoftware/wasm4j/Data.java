@@ -6,11 +6,19 @@ import java.util.List;
 
 public class Data {
     private final byte[] init;
-    private final Mode dataMode;
+    private final Mode mode;
 
-    public Data(byte[] init, Mode dataMode) {
+    public Data(byte[] init, Mode mode) {
         this.init = init;
-        this.dataMode = dataMode;
+        this.mode = mode;
+    }
+
+    public byte[] init() {
+        return init;
+    }
+
+    public Mode mode() {
+        return mode;
     }
 
     public interface Mode {
@@ -18,7 +26,7 @@ public class Data {
             return Passive.INSTANCE;
         }
 
-        static Active active(int memIndex, List<ConstantInstruction> offset) {
+        static Active active(int memIndex, ConstantExpression offset) {
             return new Active(memIndex, offset);
         }
 
@@ -28,9 +36,9 @@ public class Data {
 
         class Active implements Mode {
             private final int memIndex;
-            private final List<ConstantInstruction> offset;
+            private final ConstantExpression offset;
 
-            public Active(int memIndex, List<ConstantInstruction> offset) {
+            public Active(int memIndex, ConstantExpression offset) {
                 this.memIndex = memIndex;
                 this.offset = offset;
             }
@@ -39,7 +47,7 @@ public class Data {
                 return memIndex;
             }
 
-            public List<ConstantInstruction> offset() {
+            public ConstantExpression offset() {
                 return offset;
             }
         }

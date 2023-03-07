@@ -1,5 +1,7 @@
 package com.opencastsoftware.wasm4j.encoding.binary;
 
+import com.opencastsoftware.wasm4j.ConstantExpression;
+import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
 import com.opencastsoftware.wasm4j.instructions.ConstantInstructionVisitor;
 import com.opencastsoftware.wasm4j.instructions.numeric.floating.F32Const;
 import com.opencastsoftware.wasm4j.instructions.numeric.floating.F64Const;
@@ -71,5 +73,14 @@ public class ConstantInstructionBinaryEncodingVisitor implements ConstantInstruc
     public void visitGlobalGet(GlobalGet globalGet) throws IOException {
         output.write(Opcode.GLOBAL_GET.bytes());
         LEB128.writeUnsigned(output, globalGet.globalIndex());
+    }
+
+    @Override
+    public void visitConstantExpression(ConstantExpression constExpr) throws IOException {
+        for (ConstantInstruction instr: constExpr.instructions()) {
+            instr.accept(this);
+        }
+
+        output.write(Opcode.END.bytes());
     }
 }
