@@ -97,15 +97,16 @@ public class WasmTypeBinaryEncodingVisitor implements WasmTypeVisitor<IOExceptio
 
     @Override
     public void visitRefType(RefType ref) throws IOException {
-        if (ref.heapType() instanceof TypeId) {
-            if (ref.isNullable()) {
-                output.write(TypeOpcode.REF_NULLABLE.opcode());
+        if (!ref.isNullable()) {
+            if (ref.heapType() instanceof TypeId) {
+                output.write(TypeOpcode.REF.opcode());
                 visitHeapType(ref.heapType());
             } else {
-                output.write(TypeOpcode.REF.opcode());
+                // Short form for non-index, non-nullable heap type
                 visitHeapType(ref.heapType());
             }
         } else {
+            output.write(TypeOpcode.REF_NULLABLE.opcode());
             visitHeapType(ref.heapType());
         }
     }

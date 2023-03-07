@@ -1,8 +1,10 @@
 package com.opencastsoftware.wasm4j.encoding.binary;
 
 import com.opencastsoftware.wasm4j.Data;
-import com.opencastsoftware.wasm4j.types.FuncType;
-import com.opencastsoftware.wasm4j.types.NumType;
+import com.opencastsoftware.wasm4j.Func;
+import com.opencastsoftware.wasm4j.Import;
+import com.opencastsoftware.wasm4j.Module;
+import com.opencastsoftware.wasm4j.types.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -30,11 +32,11 @@ class WasmBinaryEncoderTest {
     }
 
     @Test
-    void testEncodeEmptyDataCount() throws IOException {
+    void testEncodeEmptyTypes() throws IOException {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();
-        encoder.encodeDataCount(output, Collections.emptyList());
-        assertArrayEquals(new byte[]{0x0}, output.toByteArray());
+        encoder.encodeTypes(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
     }
 
     @Test
@@ -65,12 +67,203 @@ class WasmBinaryEncoderTest {
     }
 
     @Test
-    void testEncodeMultipleDataCount() throws IOException {
+    void testEncodeEmptyImports() throws IOException {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();
+        encoder.encodeImports(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeImports() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeImports(output, List.of(
+                new Import("A", "a", Import.Descriptor.func(16)),
+                new Import("B", "b", Import.Descriptor.table(ExternType.table(Limits.of(1), RefType.heapExtern()))),
+                new Import("C", "c", Import.Descriptor.mem(ExternType.mem(Limits.of(1, 5)))),
+                new Import("D", "d", Import.Descriptor.global(ExternType.global(false, NumType.i32())))
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.IMPORT.id(),
+                // Section size (LEB128 u32)
+                0x1E,
+                // Imports vec length (LEB128 u32)
+                0x04,
+                // Entry 1
+                0x01, // Module name length
+                0x41, // "A"
+                0x01, // Symbol name length
+                0x61, // "a"
+                0x00, // typeidx
+                0x10, // index 16 (LEB128 u32)
+                // Entry 2
+                0x01, // Module name length
+                0x42, // "B"
+                0x01, // Symbol name length
+                0x62, // "b"
+                0x01, // tabletype
+                TypeOpcode.HEAP_EXTERN.opcode(), // Ref type shorthand
+                0x00, 0x01, // Limits
+                // Entry 3
+                0x01, // Module name length
+                0x43, // "C"
+                0x01, // Symbol name length
+                0x63, // "c"
+                0x02, // memtype
+                0x01, 0x01, 0x05, // Limits
+                // Entry 4
+                0x01, // Module name length
+                0x44, // "D"
+                0x01, // Symbol name length
+                0x64, // "d"
+                0x03, // globaltype
+                TypeOpcode.I32.opcode(), 0x00 // const
+        }, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyFunctions() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeFunctions(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeFunctions() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeFunctions(output, List.of(
+                new Func(0, Collections.emptyList(), Collections.emptyList()),
+                new Func(1, Collections.emptyList(), Collections.emptyList()),
+                new Func(2, Collections.emptyList(), Collections.emptyList())
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.FUNCTION.id(),
+                // Section size (LEB128 u32)
+                0x04,
+                // Functions vec length (LEB128 u32)
+                0x03,
+                // Entry 1
+                0x00,
+                // Entry 2
+                0x01,
+                // Entry 3
+                0x02
+        }, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyTables() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeTables(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyMemories() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeMemories(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyGlobals() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeGlobals(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyExports() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeExports(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyStart() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeStart(output, null);
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyElems() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeElems(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyDataCount() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeDataCount(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeDataCount() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
         encoder.encodeDataCount(output, List.of(
                 new Data(new byte[]{}, Data.Mode.passive()),
                 new Data(new byte[]{}, Data.Mode.passive())));
-        assertArrayEquals(new byte[]{0x02}, output.toByteArray());
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.DATA_COUNT.id(),
+                // Section size (LEB128 u32)
+                0x01,
+                // Data count
+                0x02 // 2 entries
+        }, output.toByteArray());
+    }
+
+
+    @Test
+    void testEncodeEmptyCode() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeCode(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyData() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+        encoder.encodeData(output, Collections.emptyList());
+        assertArrayEquals(new byte[]{}, output.toByteArray());
+    }
+
+    @Test
+    void testEncodeEmptyModule() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeModule(output, new Module());
+
+        assertArrayEquals(new byte[]{
+                // WASM magic
+                0x00, 0x61, 0x71, 0x6D,
+                // WASM binary format version
+                0x01, 0x00, 0x00, 0x00
+        }, output.toByteArray());
     }
 }

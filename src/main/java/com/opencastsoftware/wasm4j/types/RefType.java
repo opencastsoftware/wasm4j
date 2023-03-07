@@ -25,6 +25,14 @@ public class RefType implements ValType {
         return new RefType(false, heapType);
     }
 
+    public static RefType heapFunc() {
+        return new RefType(false, HeapType.func());
+    }
+
+    public static RefType heapExtern() {
+        return new RefType(false, HeapType.extern());
+    }
+
     @Override
     public <T extends Exception> void accept(WasmTypeVisitor<T> visitor) throws T {
         visitor.visitRefType(this);

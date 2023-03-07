@@ -60,7 +60,7 @@ class WasmTypeBinaryEncodingVisitorTest {
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
 
         visitor.visitType(
-                ExternType.table(Limits.of(0), RefType.nullable(HeapType.func())));
+                ExternType.table(Limits.of(0), RefType.heapFunc()));
         visitor.visitType(
                 ExternType.table(Limits.of(0), RefType.nullable(HeapType.typeId(-1))));
 
@@ -170,14 +170,14 @@ class WasmTypeBinaryEncodingVisitorTest {
                 // Nullable index ref type
                 TypeOpcode.REF_NULLABLE.opcode(), (byte) 0x05,
                 // Ref type 3
-                // Heap extern type
-                TypeOpcode.HEAP_EXTERN.opcode(),
+                // Nullable heap extern type
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_EXTERN.opcode(),
                 // Ref type 4
                 // Heap extern type
                 TypeOpcode.HEAP_EXTERN.opcode(),
                 // Ref type 5
-                // Heap func type
-                TypeOpcode.HEAP_FUNC.opcode(),
+                // Nullable heap func type
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_FUNC.opcode(),
                 // Ref type 6
                 // Heap func type
                 TypeOpcode.HEAP_FUNC.opcode()

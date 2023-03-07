@@ -45,14 +45,14 @@ public class Import {
         }
 
         class Func implements Descriptor {
-            private final int funcIndex;
+            private final int typeIndex;
 
             public Func(int funcIndex) {
-                this.funcIndex = funcIndex;
+                this.typeIndex = funcIndex;
             }
 
-            public int funcIndex() {
-                return funcIndex;
+            public int typeIndex() {
+                return typeIndex;
             }
         }
 
