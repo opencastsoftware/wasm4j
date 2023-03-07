@@ -31,7 +31,7 @@ public class Module {
         this.exports = exports;
     }
 
-    public Module() {
+    private Module() {
         this.types = new ArrayList<>();
         this.funcs = new ArrayList<>();
         this.tables = new ArrayList<>();

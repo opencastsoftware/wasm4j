@@ -44,7 +44,7 @@ class WasmBinaryEncoderTest {
 
         encoder.encodeTypes(output, List.of(
                 // (Int, Int) -> Int
-                new FuncType(List.of(NumType.i32(), NumType.i32()), List.of(NumType.i32()))));
+                ExternType.func(List.of(NumType.i32(), NumType.i32()), List.of(NumType.i32()))));
 
         assertArrayEquals(new byte[]{
                 // Section ID
@@ -321,7 +321,7 @@ class WasmBinaryEncoderTest {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();
 
-        encoder.encodeModule(output, new Module());
+        encoder.encodeModule(output, Module.empty());
 
         assertArrayEquals(new byte[]{
                 // WASM magic

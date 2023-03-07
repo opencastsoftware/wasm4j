@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,7 +14,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testTypeIdEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(HeapType.typeId(-1));
+        HeapType.typeId(-1).accept(visitor);
         assertArrayEquals(new byte[]{0x7F}, output.toByteArray());
     }
 
@@ -21,7 +22,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testHeapFuncEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(HeapFuncType.INSTANCE);
+        HeapFuncType.INSTANCE.accept(visitor);
         assertArrayEquals(new byte[]{TypeOpcode.HEAP_FUNC.opcode()}, output.toByteArray());
     }
 
@@ -29,7 +30,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testHeapExternEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(HeapExternType.INSTANCE);
+        HeapExternType.INSTANCE.accept(visitor);
         assertArrayEquals(new byte[]{TypeOpcode.HEAP_EXTERN.opcode()}, output.toByteArray());
     }
 
@@ -38,10 +39,10 @@ class WasmTypeBinaryEncodingVisitorTest {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
 
-        visitor.visitLimits(Limits.of(0));
-        visitor.visitLimits(Limits.of(0, 5));
-        visitor.visitLimits(Limits.of(1));
-        visitor.visitLimits(Limits.of(1, 5));
+        Limits.of(0).accept(visitor);
+        Limits.of(0, 5).accept(visitor);
+        Limits.of(1).accept(visitor);
+        Limits.of(1, 5).accept(visitor);
 
         assertArrayEquals(new byte[]{
                 // No max, no minimum
@@ -55,14 +56,44 @@ class WasmTypeBinaryEncodingVisitorTest {
     }
 
     @Test
+    void testFuncTypeEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+
+        // (Int, Int) -> Int
+        ExternType.func(List.of(NumType.i32(), NumType.i32()), List.of(NumType.i32())).accept(visitor);
+        // SomeHeapType -> Double
+        ExternType.func(List.of(RefType.nonNullable(HeapType.typeId(1))), List.of(NumType.f64())).accept(visitor);
+
+        assertArrayEquals(new byte[]{
+                // Func type 1
+                TypeOpcode.FUNC.opcode(),
+                // Arguments length (LEB128 u32)
+                0x02,
+                TypeOpcode.I32.opcode(),
+                TypeOpcode.I32.opcode(),
+                // Return types length (LEB128 u32)
+                0x01,
+                TypeOpcode.I32.opcode(),
+                // Func type 2
+                TypeOpcode.FUNC.opcode(),
+                // Arguments length (LEB128 u32)
+                0x01,
+                // Non-nullable ref type
+                TypeOpcode.REF.opcode(), 0x01,
+                // Return types length (LEB128 u32)
+                0x01,
+                TypeOpcode.F64.opcode()
+        }, output.toByteArray());
+    }
+
+    @Test
     void testTableTypeEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
 
-        visitor.visitType(
-                ExternType.table(Limits.of(0), RefType.heapFunc()));
-        visitor.visitType(
-                ExternType.table(Limits.of(0), RefType.nullable(HeapType.typeId(-1))));
+        ExternType.table(Limits.of(0), RefType.heapFunc()).accept(visitor);
+        ExternType.table(Limits.of(0), RefType.nullable(HeapType.typeId(-1))).accept(visitor);
 
         assertArrayEquals(new byte[]{
                 // Table type 1
@@ -83,8 +114,8 @@ class WasmTypeBinaryEncodingVisitorTest {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
 
-        visitor.visitType(ExternType.mem(Limits.of(0)));
-        visitor.visitType(ExternType.mem(Limits.of(1, 5)));
+        ExternType.mem(Limits.of(0)).accept(visitor);
+        ExternType.mem(Limits.of(1, 5)).accept(visitor);
 
         assertArrayEquals(new byte[]{
                 // Mem type 1
@@ -101,10 +132,8 @@ class WasmTypeBinaryEncodingVisitorTest {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
 
-        visitor.visitType(
-                GlobalType.immutable(RefType.nonNullable(HeapType.typeId(-1))));
-        visitor.visitType(
-                GlobalType.mutable(NumType.i32()));
+        GlobalType.immutable(RefType.nonNullable(HeapType.typeId(-1))).accept(visitor);
+        GlobalType.mutable(NumType.i32()).accept(visitor);
 
         assertArrayEquals(new byte[]{
                 // Global type 1
@@ -122,7 +151,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testI32TypeEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(NumType.i32());
+        NumType.i32().accept(visitor);
         assertArrayEquals(new byte[]{TypeOpcode.I32.opcode()}, output.toByteArray());
     }
 
@@ -130,7 +159,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testI64TypeEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(NumType.i64());
+        NumType.i64().accept(visitor);
         assertArrayEquals(new byte[]{TypeOpcode.I64.opcode()}, output.toByteArray());
     }
 
@@ -138,7 +167,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testF32TypeEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(NumType.f32());
+        NumType.f32().accept(visitor);
         assertArrayEquals(new byte[]{TypeOpcode.F32.opcode()}, output.toByteArray());
     }
 
@@ -146,7 +175,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testF64TypeEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(NumType.f64());
+        NumType.f64().accept(visitor);
         assertArrayEquals(new byte[]{TypeOpcode.F64.opcode()}, output.toByteArray());
     }
 
@@ -155,12 +184,12 @@ class WasmTypeBinaryEncodingVisitorTest {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
 
-        visitor.visitType(RefType.nonNullable(HeapType.typeId(-1)));
-        visitor.visitType(RefType.nullable(HeapType.typeId(5)));
-        visitor.visitType(RefType.nullable(HeapType.extern()));
-        visitor.visitType(RefType.nonNullable(HeapType.extern()));
-        visitor.visitType(RefType.nullable(HeapType.func()));
-        visitor.visitType(RefType.nonNullable(HeapType.func()));
+        RefType.nonNullable(HeapType.typeId(-1)).accept(visitor);
+        RefType.nullable(HeapType.typeId(5)).accept(visitor);
+        RefType.nullable(HeapType.extern()).accept(visitor);
+        RefType.nonNullable(HeapType.extern()).accept(visitor);
+        RefType.nullable(HeapType.func()).accept(visitor);
+        RefType.nonNullable(HeapType.func()).accept(visitor);
 
         assertArrayEquals(new byte[]{
                 // Ref type 1
@@ -188,7 +217,7 @@ class WasmTypeBinaryEncodingVisitorTest {
     void testV128TypeEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
-        visitor.visitType(VecType.v128());
+        VecType.v128().accept(visitor);
         assertArrayEquals(new byte[]{TypeOpcode.V128.opcode()}, output.toByteArray());
     }
 }
