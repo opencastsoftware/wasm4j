@@ -1,6 +1,5 @@
 package com.opencastsoftware.wasm4j;
 
-import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
 import com.opencastsoftware.wasm4j.types.RefType;
 
 import java.util.List;
@@ -8,12 +7,12 @@ import java.util.List;
 public class Elem {
     private final RefType type;
     private final List<ConstantExpression> init;
-    private final Mode elemMode;
+    private final Mode mode;
 
-    public Elem(RefType type, List<ConstantExpression> init, Mode elemMode) {
+    public Elem(RefType type, List<ConstantExpression> init, Mode mode) {
         this.type = type;
         this.init = init;
-        this.elemMode = elemMode;
+        this.mode = mode;
     }
 
     public RefType type() {
@@ -24,8 +23,8 @@ public class Elem {
         return init;
     }
 
-    public Mode elemMode() {
-        return elemMode;
+    public Mode mode() {
+        return mode;
     }
 
     public interface Mode {

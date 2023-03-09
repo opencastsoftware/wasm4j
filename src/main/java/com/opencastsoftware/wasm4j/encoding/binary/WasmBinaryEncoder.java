@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class WasmBinaryEncoder implements WasmEncoder {
+public class WasmBinaryEncoder implements WasmEncoder<IOException> {
     static final byte[] WASM_MAGIC = new byte[]{0x00, 0x61, 0x71, 0x6D};
     static final byte[] WASM_BINARY_FORMAT_VERSION = new byte[]{0x01, 0x00, 0x00, 0x00};
 
@@ -114,16 +114,10 @@ public class WasmBinaryEncoder implements WasmEncoder {
 
             LEB128.writeUnsigned(intermediate, tables.size());
             for (Table table : tables) {
-                // TODO: Handle shorthand table declaration - needs instruction equals implementations
-                // if (table.type().refType().isNullable() &&
-                //         table.init().instructions().isEmpty()) {
-                //     table.type().accept(typeVisitor);
-                // } else {
                 intermediate.write(0x40);
                 intermediate.write(0x00);
                 table.type().accept(typeVisitor);
                 table.init().accept(constExprVisitor);
-                // }
             }
 
             encodeSection(output, SectionId.TABLE, intermediate.toByteArray());
@@ -209,10 +203,38 @@ public class WasmBinaryEncoder implements WasmEncoder {
     public void encodeElems(OutputStream output, List<Elem> elems) throws IOException {
         if (!elems.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
+            var typeVisitor = new WasmTypeBinaryEncodingVisitor(intermediate);
+            var constExprVisitor = new ConstantInstructionBinaryEncodingVisitor(intermediate, typeVisitor);
 
             LEB128.writeUnsigned(intermediate, elems.size());
             for (Elem elem : elems) {
+                // Could be replaced with a bitfield if more flags are added
+                int indicator = 0;
 
+                // Bit 0 indicates whether this is an active segment or not
+                // Bit 2 indicates that we're using element types and element expressions
+                if (elem.mode() instanceof Elem.Mode.Active) {
+                    // For an active segment, bit 1 indicates that we are using explicit table indices
+                    indicator = 0b110;
+                    var active = (Elem.Mode.Active) elem.mode();
+                    LEB128.writeUnsigned(intermediate, indicator);
+                    LEB128.writeUnsigned(intermediate, active.tableIndex());
+                    active.offset().accept(constExprVisitor);
+                } else {
+                    if (elem.mode() instanceof Elem.Mode.Declarative) {
+                        indicator = 0b111;
+                    } else {
+                        indicator = 0b101;
+                    }
+                    LEB128.writeUnsigned(intermediate, indicator);
+                }
+
+                elem.type().accept(typeVisitor);
+
+                LEB128.writeUnsigned(intermediate, elem.init().size());
+                for (ConstantExpression initExpr : elem.init()) {
+                    initExpr.accept(constExprVisitor);
+                }
             }
 
             encodeSection(output, SectionId.ELEMENT, intermediate.toByteArray());

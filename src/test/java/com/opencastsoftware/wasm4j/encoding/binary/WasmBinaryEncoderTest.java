@@ -361,6 +361,77 @@ class WasmBinaryEncoderTest {
     }
 
     @Test
+    void testEncodeElems() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeElems(output, List.of(
+                new Elem(
+                        RefType.nullable(HeapType.func()),
+                        List.of(ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.func()))),
+                        Elem.Mode.passive()),
+                new Elem(
+                        RefType.nullable(HeapType.func()),
+                        List.of(ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.func()))),
+                        Elem.Mode.declarative()),
+                new Elem(
+                        RefType.nullable(HeapType.func()),
+                        List.of(ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.func()))),
+                        Elem.Mode.active(0, ConstantExpression.of(NumericInstruction.i32_const(2)))),
+                new Elem(
+                        RefType.nullable(HeapType.func()),
+                        List.of(ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.func()))),
+                        Elem.Mode.active(4, ConstantExpression.of(NumericInstruction.i32_const(2))))
+        ));
+
+        // The encoding of the preceding integer of each entry is as follows:
+
+        //| Int | Binary | Bit 2        | Bit 1          | Bit 0      |
+        //|-----------------------------------------------------------|
+        //| 0   | 000    | element kind | no table index | active     |
+        //| 1   | 001    | element kind | passive        | non-active |
+        //| 2   | 010    | element kind | table index    | active     |
+        //| 3   | 011    | element kind | declarative    | non-active |
+        //| 4   | 100    | element type | no table index | active     |
+        //| 5   | 101    | element type | passive        | non-active |
+        //| 6   | 110    | element type | table index    | active     |
+        //| 7   | 111    | element type | declarative    | non-active |
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.ELEMENT.id(),
+                // Section size (LEB128 u32)
+                0x25,
+                // Elements vec length (LEB128 u32)
+                0x04,
+                // Entry 1
+                0x05, // Passive segment declared with element type
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_FUNC.opcode(), // Nullable heap function type
+                0x01, // Initialiser instruction vec length (LEB128 u32)
+                Opcode.REF_NULL.opcode(), TypeOpcode.HEAP_FUNC.opcode(), Opcode.END.opcode(), // Init expression
+                // Entry 2
+                0x07, // Declarative segment declared with element type
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_FUNC.opcode(), // Nullable heap function type
+                0x01, // Initialiser instruction vec length (LEB128 u32)
+                Opcode.REF_NULL.opcode(), TypeOpcode.HEAP_FUNC.opcode(), Opcode.END.opcode(), // Init expression
+                // Entry 3
+                0x06, // Active segment declared with element type and explicit table index
+                0x00, // Table index
+                Opcode.I32_CONST.opcode(), 0x02, Opcode.END.opcode(), // Offset expression
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_FUNC.opcode(), // Nullable heap function type
+                0x01, // Initialiser instruction vec length (LEB128 u32)
+                Opcode.REF_NULL.opcode(), TypeOpcode.HEAP_FUNC.opcode(), Opcode.END.opcode(), // Init expression
+                // Entry 4
+                0x06, // Active segment declared with element type and explicit table index
+                0x04, // Table index
+                Opcode.I32_CONST.opcode(), 0x02, Opcode.END.opcode(), // Offset expression
+                TypeOpcode.REF_NULLABLE.opcode(), TypeOpcode.HEAP_FUNC.opcode(), // Nullable heap function type
+                0x01, // Initialiser instruction vec length (LEB128 u32)
+                Opcode.REF_NULL.opcode(), TypeOpcode.HEAP_FUNC.opcode(), Opcode.END.opcode(), // Init expression
+        }, output.toByteArray());
+    }
+
+    @Test
     void testEncodeEmptyDataCount() throws IOException {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();
