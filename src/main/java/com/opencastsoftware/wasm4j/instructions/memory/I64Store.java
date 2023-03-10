@@ -1,6 +1,6 @@
 package com.opencastsoftware.wasm4j.instructions.memory;
 
-public class I64Store implements MemoryInstruction {
+public class I64Store implements MemArgInstruction {
     private final int offset;
     private final int align;
 

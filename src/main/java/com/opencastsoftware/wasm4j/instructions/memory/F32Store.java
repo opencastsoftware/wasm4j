@@ -1,6 +1,6 @@
 package com.opencastsoftware.wasm4j.instructions.memory;
 
-public class F32Store implements MemoryInstruction {
+public class F32Store implements MemArgInstruction {
     private final int offset;
     private final int align;
 

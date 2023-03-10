@@ -163,565 +163,587 @@ public class InstructionBinaryEncodingVisitor extends ConstantInstructionBinaryE
     }
 
     // Memory instructions
+    private void visitMemArgInstruction(MemArgInstruction memArg) throws IOException {
+        LEB128.writeUnsigned(output, memArg.align());
+        LEB128.writeUnsigned(output, memArg.offset());
+    }
+
     @Override
     public void visitI32Load(I32Load i32Load) throws IOException {
-
+        output.write(Opcode.I32_LOAD.opcode());
+        visitMemArgInstruction(i32Load);
     }
 
     @Override
     public void visitI64Load(I64Load i64Load) throws IOException {
-
+        output.write(Opcode.I64_LOAD.opcode());
+        visitMemArgInstruction(i64Load);
     }
 
     @Override
     public void visitF32Load(F32Load f32Load) throws IOException {
-
+        output.write(Opcode.F32_LOAD.opcode());
+        visitMemArgInstruction(f32Load);
     }
 
     @Override
     public void visitF64Load(F64Load f64Load) throws IOException {
-
+        output.write(Opcode.F64_LOAD.opcode());
+        visitMemArgInstruction(f64Load);
     }
 
     @Override
     public void visitI32Store(I32Store i32Store) throws IOException {
-
+        output.write(Opcode.I32_STORE.opcode());
+        visitMemArgInstruction(i32Store);
     }
 
     @Override
     public void visitI64Store(I64Store i64Store) throws IOException {
-
+        output.write(Opcode.I64_STORE.opcode());
+        visitMemArgInstruction(i64Store);
     }
 
     @Override
     public void visitF32Store(F32Store f32Store) throws IOException {
-
+        output.write(Opcode.F32_STORE.opcode());
+        visitMemArgInstruction(f32Store);
     }
 
     @Override
     public void visitF64Store(F64Store f64Store) throws IOException {
-
+        output.write(Opcode.F64_STORE.opcode());
+        visitMemArgInstruction(f64Store);
     }
 
     @Override
     public void visitMemorySize(MemorySize memorySize) throws IOException {
-
+        output.write(Opcode.MEMORY_SIZE.opcode());
+        LEB128.writeUnsigned(output, memorySize.memIndex());
     }
 
     @Override
     public void visitMemoryGrow(MemoryGrow memoryGrow) throws IOException {
-
+        output.write(Opcode.MEMORY_GROW.opcode());
+        LEB128.writeUnsigned(output, memoryGrow.memIndex());
     }
 
     @Override
     public void visitMemoryFill(MemoryFill memoryFill) throws IOException {
-
+        output.write(Opcode.MEMORY_FILL.bytes());
+        LEB128.writeUnsigned(output, memoryFill.memIndex());
     }
 
     @Override
     public void visitMemoryCopy(MemoryCopy memoryCopy) throws IOException {
-
+        // TODO: Check parameter ordering once indexing additional memories is possible
+        output.write(Opcode.MEMORY_COPY.bytes());
+        LEB128.writeUnsigned(output, memoryCopy.targetMemIndex());
+        LEB128.writeUnsigned(output, memoryCopy.sourceMemIndex());
     }
 
     @Override
     public void visitMemoryInit(MemoryInit memoryInit) throws IOException {
-
+        output.write(Opcode.MEMORY_INIT.bytes());
+        LEB128.writeUnsigned(output, memoryInit.dataIndex());
+        LEB128.writeUnsigned(output, memoryInit.memIndex());
     }
 
     @Override
     public void visitDataDrop(DataDrop dataDrop) throws IOException {
-
+        output.write(Opcode.DATA_DROP.bytes());
+        LEB128.writeUnsigned(output, dataDrop.dataIndex());
     }
 
     // Numeric instructions
     @Override
     public void visitI32Clz(I32Clz i32Clz) throws IOException {
-
+        output.write(Opcode.I32_CLZ.opcode());
     }
 
     @Override
     public void visitI32Ctz(I32Ctz i32Ctz) throws IOException {
-
+        output.write(Opcode.I32_CTZ.opcode());
     }
 
     @Override
     public void visitI32Popcnt(I32Popcnt i32Popcnt) throws IOException {
-
+        output.write(Opcode.I32_POPCNT.opcode());
     }
 
     @Override
     public void visitI64Clz(I64Clz i64Clz) throws IOException {
-
+        output.write(Opcode.I64_CLZ.opcode());
     }
 
     @Override
     public void visitI64Ctz(I64Ctz i64Ctz) throws IOException {
-
+        output.write(Opcode.I64_CTZ.opcode());
     }
 
     @Override
     public void visitI64Popcnt(I64Popcnt i64Popcnt) throws IOException {
-
+        output.write(Opcode.I64_POPCNT.opcode());
     }
 
     @Override
     public void visitF32Abs(F32Abs f32Abs) throws IOException {
-
+        output.write(Opcode.F32_ABS.opcode());
     }
 
     @Override
     public void visitF32Ceil(F32Ceil f32Ceil) throws IOException {
-
+        output.write(Opcode.F32_CEIL.opcode());
     }
 
     @Override
     public void visitF32Floor(F32Floor f32Floor) throws IOException {
-
+        output.write(Opcode.F32_FLOOR.opcode());
     }
 
     @Override
     public void visitF32Nearest(F32Nearest f32Nearest) throws IOException {
-
+        output.write(Opcode.F32_NEAREST.opcode());
     }
 
     @Override
     public void visitF32Neg(F32Neg f32Neg) throws IOException {
-
+        output.write(Opcode.F32_NEG.opcode());
     }
 
     @Override
     public void visitF32Sqrt(F32Sqrt f32Sqrt) throws IOException {
-
+        output.write(Opcode.F32_SQRT.opcode());
     }
 
     @Override
     public void visitF32Trunc(F32Trunc f32Trunc) throws IOException {
-
+        output.write(Opcode.F32_TRUNC.opcode());
     }
 
     @Override
     public void visitF64Abs(F64Abs f64Abs) throws IOException {
-
+        output.write(Opcode.F64_ABS.opcode());
     }
 
     @Override
     public void visitF64Ceil(F64Ceil f64Ceil) throws IOException {
-
+        output.write(Opcode.F64_CEIL.opcode());
     }
 
     @Override
     public void visitF64Floor(F64Floor f64Floor) throws IOException {
-
+        output.write(Opcode.F64_FLOOR.opcode());
     }
 
     @Override
     public void visitF64Nearest(F64Nearest f64Nearest) throws IOException {
-
+        output.write(Opcode.F64_NEAREST.opcode());
     }
 
     @Override
     public void visitF64Neg(F64Neg f64Neg) throws IOException {
-
+        output.write(Opcode.F64_NEG.opcode());
     }
 
     @Override
     public void visitF64Sqrt(F64Sqrt f64Sqrt) throws IOException {
-
+        output.write(Opcode.F64_SQRT.opcode());
     }
 
     @Override
     public void visitF64Trunc(F64Trunc f64Trunc) throws IOException {
-
+        output.write(Opcode.F64_TRUNC.opcode());
     }
 
     @Override
     public void visitI32Add(I32Add i32Add) throws IOException {
-
+        output.write(Opcode.I32_ADD.opcode());
     }
 
     @Override
     public void visitI32And(I32And i32And) throws IOException {
-
+        output.write(Opcode.I32_AND.opcode());
     }
 
     @Override
     public void visitI32DivSigned(I32DivSigned i32DivSigned) throws IOException {
-
+        output.write(Opcode.I32_DIV_S.opcode());
     }
 
     @Override
     public void visitI32DivUnsigned(I32DivUnsigned i32DivUnsigned) throws IOException {
-
+        output.write(Opcode.I32_DIV_U.opcode());
     }
 
     @Override
     public void visitI32Mul(I32Mul i32Mul) throws IOException {
-
+        output.write(Opcode.I32_MUL.opcode());
     }
 
     @Override
     public void visitI32Or(I32Or i32Or) throws IOException {
-
+        output.write(Opcode.I32_OR.opcode());
     }
 
     @Override
     public void visitI32RemSigned(I32RemSigned i32RemSigned) throws IOException {
-
+        output.write(Opcode.I32_REM_S.opcode());
     }
 
     @Override
     public void visitI32RemUnsigned(I32RemUnsigned i32RemUnsigned) throws IOException {
-
+        output.write(Opcode.I32_REM_U.opcode());
     }
 
     @Override
     public void visitI32Rotl(I32Rotl i32Rotl) throws IOException {
-
+        output.write(Opcode.I32_ROTL.opcode());
     }
 
     @Override
     public void visitI32Rotr(I32Rotr i32Rotr) throws IOException {
-
+        output.write(Opcode.I32_ROTR.opcode());
     }
 
     @Override
     public void visitI32Shl(I32Shl i32Shl) throws IOException {
-
+        output.write(Opcode.I32_SHL.opcode());
     }
 
     @Override
     public void visitI32ShrSigned(I32ShrSigned i32ShrSigned) throws IOException {
-
+        output.write(Opcode.I32_SHR_S.opcode());
     }
 
     @Override
     public void visitI32ShrUnsigned(I32ShrUnsigned i32ShrUnsigned) throws IOException {
-
+        output.write(Opcode.I32_SHR_U.opcode());
     }
 
     @Override
     public void visitI32Sub(I32Sub i32Sub) throws IOException {
-
+        output.write(Opcode.I32_SUB.opcode());
     }
 
     @Override
     public void visitI32Xor(I32Xor i32Xor) throws IOException {
-
+        output.write(Opcode.I32_XOR.opcode());
     }
 
     @Override
     public void visitI64Add(I64Add i64Add) throws IOException {
-
+        output.write(Opcode.I64_ADD.opcode());
     }
 
     @Override
     public void visitI64And(I64And i64And) throws IOException {
-
+        output.write(Opcode.I64_AND.opcode());
     }
 
     @Override
     public void visitI64DivSigned(I64DivSigned i64DivSigned) throws IOException {
-
+        output.write(Opcode.I64_DIV_S.opcode());
     }
 
     @Override
     public void visitI64DivUnsigned(I64DivUnsigned i64DivUnsigned) throws IOException {
-
+        output.write(Opcode.I64_DIV_U.opcode());
     }
 
     @Override
     public void visitI64Mul(I64Mul i64Mul) throws IOException {
-
+        output.write(Opcode.I64_MUL.opcode());
     }
 
     @Override
     public void visitI64Or(I64Or i64Or) throws IOException {
-
+        output.write(Opcode.I64_OR.opcode());
     }
 
     @Override
     public void visitI64RemSigned(I64RemSigned i64RemSigned) throws IOException {
-
+        output.write(Opcode.I64_REM_S.opcode());
     }
 
     @Override
     public void visitI64RemUnsigned(I64RemUnsigned i64RemUnsigned) throws IOException {
-
+        output.write(Opcode.I64_REM_U.opcode());
     }
 
     @Override
     public void visitI64Rotl(I64Rotl i64Rotl) throws IOException {
-
+        output.write(Opcode.I64_ROTL.opcode());
     }
 
     @Override
     public void visitI64Rotr(I64Rotr i64Rotr) throws IOException {
-
+        output.write(Opcode.I64_ROTR.opcode());
     }
 
     @Override
     public void visitI64Shl(I64Shl i64Shl) throws IOException {
-
+        output.write(Opcode.I64_SHL.opcode());
     }
 
     @Override
     public void visitI64ShrSigned(I64ShrSigned i64ShrSigned) throws IOException {
-
+        output.write(Opcode.I64_SHR_S.opcode());
     }
 
     @Override
     public void visitI64ShrUnsigned(I64ShrUnsigned i64ShrUnsigned) throws IOException {
-
+        output.write(Opcode.I64_SHR_U.opcode());
     }
 
     @Override
     public void visitI64Sub(I64Sub i64Sub) throws IOException {
-
+        output.write(Opcode.I64_SUB.opcode());
     }
 
     @Override
     public void visitI64Xor(I64Xor i64Xor) throws IOException {
-
+        output.write(Opcode.I64_XOR.opcode());
     }
 
     @Override
     public void visitF32Add(F32Add f32Add) throws IOException {
-
+        output.write(Opcode.F32_ADD.opcode());
     }
 
     @Override
     public void visitF32Copysign(F32Copysign f32Copysign) throws IOException {
-
+        output.write(Opcode.F32_COPYSIGN.opcode());
     }
 
     @Override
     public void visitF32Div(F32Div f32Div) throws IOException {
-
+        output.write(Opcode.F32_DIV.opcode());
     }
 
     @Override
     public void visitF32Max(F32Max f32Max) throws IOException {
-
+        output.write(Opcode.F32_MAX.opcode());
     }
 
     @Override
     public void visitF32Min(F32Min f32Min) throws IOException {
-
+        output.write(Opcode.F32_MIN.opcode());
     }
 
     @Override
     public void visitF32Mul(F32Mul f32Mul) throws IOException {
-
+        output.write(Opcode.F32_MUL.opcode());
     }
 
     @Override
     public void visitF32Sub(F32Sub f32Sub) throws IOException {
-
+        output.write(Opcode.F32_SUB.opcode());
     }
 
     @Override
     public void visitF64Add(F64Add f64Add) throws IOException {
-
+        output.write(Opcode.F64_ADD.opcode());
     }
 
     @Override
     public void visitF64Copysign(F64Copysign f64Copysign) throws IOException {
-
+        output.write(Opcode.F64_COPYSIGN.opcode());
     }
 
     @Override
     public void visitF64Div(F64Div f64Div) throws IOException {
-
+        output.write(Opcode.F64_DIV.opcode());
     }
 
     @Override
     public void visitF64Max(F64Max f64Max) throws IOException {
-
+        output.write(Opcode.F64_MAX.opcode());
     }
 
     @Override
     public void visitF64Min(F64Min f64Min) throws IOException {
-
+        output.write(Opcode.F64_MIN.opcode());
     }
 
     @Override
     public void visitF64Mul(F64Mul f64Mul) throws IOException {
-
+        output.write(Opcode.F64_MUL.opcode());
     }
 
     @Override
     public void visitF64Sub(F64Sub f64Sub) throws IOException {
-
+        output.write(Opcode.F64_SUB.opcode());
     }
 
     @Override
     public void visitI32Eqz(I32Eqz i32Eqz) throws IOException {
-
+        output.write(Opcode.I32_EQZ.opcode());
     }
 
     @Override
     public void visitI64Eqz(I64Eqz i64Eqz) throws IOException {
-
+        output.write(Opcode.I64_EQZ.opcode());
     }
 
     @Override
     public void visitI32Eq(I32Eq i32Eq) throws IOException {
-
+        output.write(Opcode.I32_EQ.opcode());
     }
 
     @Override
     public void visitI32GeSigned(I32GeSigned i32GeSigned) throws IOException {
-
+        output.write(Opcode.I32_GE_S.opcode());
     }
 
     @Override
     public void visitI32GeUnsigned(I32GeUnsigned i32GeUnsigned) throws IOException {
-
+        output.write(Opcode.I32_GE_U.opcode());
     }
 
     @Override
     public void visitI32GtSigned(I32GtSigned i32GtSigned) throws IOException {
-
+        output.write(Opcode.I32_GT_S.opcode());
     }
 
     @Override
     public void visitI32GtUnsigned(I32GtUnsigned i32GtUnsigned) throws IOException {
-
+        output.write(Opcode.I32_GT_U.opcode());
     }
 
     @Override
     public void visitI32LeSigned(I32LeSigned i32LeSigned) throws IOException {
-
+        output.write(Opcode.I32_LE_S.opcode());
     }
 
     @Override
     public void visitI32LeUnsigned(I32LeUnsigned i32LeUnsigned) throws IOException {
-
+        output.write(Opcode.I32_LE_U.opcode());
     }
 
     @Override
     public void visitI32LtSigned(I32LtSigned i32LtSigned) throws IOException {
-
+        output.write(Opcode.I32_LT_S.opcode());
     }
 
     @Override
     public void visitI32LtUnsigned(I32LtUnsigned i32LtUnsigned) throws IOException {
-
+        output.write(Opcode.I32_LT_U.opcode());
     }
 
     @Override
     public void visitI32Ne(I32Ne i32Ne) throws IOException {
-
+        output.write(Opcode.I32_NE.opcode());
     }
 
     @Override
     public void visitI64Eq(I64Eq i64Eq) throws IOException {
-
+        output.write(Opcode.I64_EQ.opcode());
     }
 
     @Override
     public void visitI64GeSigned(I64GeSigned i64GeSigned) throws IOException {
-
+        output.write(Opcode.I64_GE_S.opcode());
     }
 
     @Override
     public void visitI64GeUnsigned(I64GeUnsigned i64GeUnsigned) throws IOException {
-
+        output.write(Opcode.I64_GE_U.opcode());
     }
 
     @Override
     public void visitI64GtSigned(I64GtSigned i64GtSigned) throws IOException {
-
+        output.write(Opcode.I64_GT_S.opcode());
     }
 
     @Override
     public void visitI64GtUnsigned(I64GtUnsigned i64GtUnsigned) throws IOException {
-
+        output.write(Opcode.I64_GT_U.opcode());
     }
 
     @Override
     public void visitI64LeSigned(I64LeSigned i64LeSigned) throws IOException {
-
+        output.write(Opcode.I64_LE_S.opcode());
     }
 
     @Override
     public void visitI64LeUnsigned(I64LeUnsigned i64LeUnsigned) throws IOException {
-
+        output.write(Opcode.I64_LE_U.opcode());
     }
 
     @Override
     public void visitI64LtSigned(I64LtSigned i64LtSigned) throws IOException {
-
+        output.write(Opcode.I64_LT_S.opcode());
     }
 
     @Override
     public void visitI64LtUnsigned(I64LtUnsigned i64LtUnsigned) throws IOException {
-
+        output.write(Opcode.I64_LT_U.opcode());
     }
 
     @Override
     public void visitI64Ne(I64Ne i64Ne) throws IOException {
-
+        output.write(Opcode.I64_NE.opcode());
     }
 
     @Override
     public void visitF32Eq(F32Eq f32Eq) throws IOException {
-
+        output.write(Opcode.F32_EQ.opcode());
     }
 
     @Override
     public void visitF32Ge(F32Ge f32Ge) throws IOException {
-
+        output.write(Opcode.F32_GE.opcode());
     }
 
     @Override
     public void visitF32Gt(F32Gt f32Gt) throws IOException {
-
+        output.write(Opcode.F32_GT.opcode());
     }
 
     @Override
     public void visitF32Le(F32Le f32Le) throws IOException {
-
+        output.write(Opcode.F32_LE.opcode());
     }
 
     @Override
     public void visitF32Lt(F32Lt f32Lt) throws IOException {
-
+        output.write(Opcode.F32_LT.opcode());
     }
 
     @Override
     public void visitF32Ne(F32Ne f32Ne) throws IOException {
-
+        output.write(Opcode.F32_NE.opcode());
     }
 
     @Override
     public void visitF64Eq(F64Eq f64Eq) throws IOException {
-
+        output.write(Opcode.F64_EQ.opcode());
     }
 
     @Override
     public void visitF64Ge(F64Ge f64Ge) throws IOException {
-
+        output.write(Opcode.F64_GE.opcode());
     }
 
     @Override
     public void visitF64Gt(F64Gt f64Gt) throws IOException {
-
+        output.write(Opcode.F64_GT.opcode());
     }
 
     @Override
     public void visitF64Le(F64Le f64Le) throws IOException {
-
+        output.write(Opcode.F64_LE.opcode());
     }
 
     @Override
     public void visitF64Lt(F64Lt f64Lt) throws IOException {
-
+        output.write(Opcode.F64_LT.opcode());
     }
 
     @Override
     public void visitF64Ne(F64Ne f64Ne) throws IOException {
-
+        output.write(Opcode.F64_NE.opcode());
     }
 
     @Override
