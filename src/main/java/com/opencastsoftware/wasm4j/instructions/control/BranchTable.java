@@ -16,4 +16,9 @@ public class BranchTable implements ControlInstruction {
     public int defaultLabel() {
         return defaultLabel;
     }
+
+    @Override
+    public <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T {
+        visitor.visitBranchTable(this);
+    }
 }

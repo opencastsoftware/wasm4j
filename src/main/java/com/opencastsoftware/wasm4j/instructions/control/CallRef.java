@@ -10,4 +10,9 @@ public class CallRef implements ControlInstruction {
     public int typeIndex() {
         return typeIndex;
     }
+
+    @Override
+    public <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T {
+        visitor.visitCallRef(this);
+    }
 }

@@ -1,6 +1,7 @@
 package com.opencastsoftware.wasm4j.instructions.numeric;
 
 import com.opencastsoftware.wasm4j.instructions.Instruction;
+import com.opencastsoftware.wasm4j.instructions.InstructionVisitor;
 import com.opencastsoftware.wasm4j.instructions.numeric.floating.F32Const;
 import com.opencastsoftware.wasm4j.instructions.numeric.floating.F64Const;
 import com.opencastsoftware.wasm4j.instructions.numeric.floating.binary.*;
@@ -9,12 +10,19 @@ import com.opencastsoftware.wasm4j.instructions.numeric.floating.unary.*;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.I32Const;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.I64Const;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.binary.*;
+import com.opencastsoftware.wasm4j.instructions.numeric.integer.conversion.*;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.relational.*;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.test.I32Eqz;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.test.I64Eqz;
 import com.opencastsoftware.wasm4j.instructions.numeric.integer.unary.*;
 
 public interface NumericInstruction extends Instruction {
+    <T extends Exception> void accept(NumericInstructionVisitor<T> visitor) throws T;
+
+    default <T extends Exception> void accept(InstructionVisitor<T> visitor) throws T {
+        accept((NumericInstructionVisitor<T>) visitor);
+    }
+
     // Integer constant operations
     static I32Const i32_const(int value) {
         return new I32Const(value);
@@ -430,5 +438,170 @@ public interface NumericInstruction extends Instruction {
 
     static F64Ge f64_ge() {
         return F64Ge.INSTANCE;
+    }
+
+    // Integer conversion operations
+    static I32Extend8Signed i32_extend8_s() {
+        return I32Extend8Signed.INSTANCE;
+    }
+
+    static I64Extend8Signed i64_extend8_s() {
+        return I64Extend8Signed.INSTANCE;
+    }
+
+    static I32Extend16Signed i32_extend16_s() {
+        return I32Extend16Signed.INSTANCE;
+    }
+
+    static I64Extend16Signed i64_extend16_s() {
+        return I64Extend16Signed.INSTANCE;
+    }
+
+    static I64Extend32Signed i64_extend32_s() {
+        return I64Extend32Signed.INSTANCE;
+    }
+
+    static I32WrapI64 i32_wrap_i64() {
+        return I32WrapI64.INSTANCE;
+    }
+
+    static I64ExtendI32Signed i64_extend_i32_s() {
+        return I64ExtendI32Signed.INSTANCE;
+    }
+
+    static I64ExtendI32Unsigned i64_extend_i32_u() {
+        return I64ExtendI32Unsigned.INSTANCE;
+    }
+
+    static I32TruncF32Signed i32_trunc_f32_s() {
+        return I32TruncF32Signed.INSTANCE;
+    }
+
+    static I32TruncF32Unsigned i32_trunc_f32_u() {
+        return I32TruncF32Unsigned.INSTANCE;
+    }
+
+    static I32TruncF64Signed i32_trunc_f64_s() {
+        return I32TruncF64Signed.INSTANCE;
+    }
+
+    static I32TruncF64Unsigned i32_trunc_f64_u() {
+        return I32TruncF64Unsigned.INSTANCE;
+    }
+
+    static I64TruncF32Signed i64_trunc_f32_s() {
+        return I64TruncF32Signed.INSTANCE;
+    }
+
+    static I64TruncF32Unsigned i64_trunc_f32_u() {
+        return I64TruncF32Unsigned.INSTANCE;
+    }
+
+    static I64TruncF64Signed i64_trunc_f64_s() {
+        return I64TruncF64Signed.INSTANCE;
+    }
+
+    static I64TruncF64Unsigned i64_trunc_f64_u() {
+        return I64TruncF64Unsigned.INSTANCE;
+    }
+
+    static I32TruncSatF32Signed i32_trunc_sat_f32_s() {
+        return I32TruncSatF32Signed.INSTANCE;
+    }
+
+    static I32TruncSatF32Unsigned i32_trunc_sat_f32_u() {
+        return I32TruncSatF32Unsigned.INSTANCE;
+    }
+
+    static I32TruncSatF64Signed i32_trunc_sat_f64_s() {
+        return I32TruncSatF64Signed.INSTANCE;
+    }
+
+    static I32TruncSatF64Unsigned i32_trunc_sat_f64_u() {
+        return I32TruncSatF64Unsigned.INSTANCE;
+    }
+
+    static I64TruncSatF32Signed i64_trunc_sat_f32_s() {
+        return I64TruncSatF32Signed.INSTANCE;
+    }
+
+    static I64TruncSatF32Unsigned i64_trunc_sat_f32_u() {
+        return I64TruncSatF32Unsigned.INSTANCE;
+    }
+
+    static I64TruncSatF64Signed i64_trunc_sat_f64_s() {
+        return I64TruncSatF64Signed.INSTANCE;
+    }
+
+    static I64TruncSatF64Unsigned i64_trunc_sat_f64_u() {
+        return I64TruncSatF64Unsigned.INSTANCE;
+    }
+
+    static F32DemoteF64 f32_demote_f64() {
+        return F32DemoteF64.INSTANCE;
+    }
+
+    static F32ConvertI32Signed f32_convert_i32_s() {
+        return F32ConvertI32Signed.INSTANCE;
+    }
+
+    static F32ConvertI32Unsigned f32_convert_i32_u() {
+        return F32ConvertI32Unsigned.INSTANCE;
+    }
+
+    static F32ConvertI64Signed f32_convert_i64_s() {
+        return F32ConvertI64Signed.INSTANCE;
+    }
+
+    static F32ConvertI64Unsigned f32_convert_i64_u() {
+        return F32ConvertI64Unsigned.INSTANCE;
+    }
+
+    static F64ConvertI32Signed f64_convert_i32_s() {
+        return F64ConvertI32Signed.INSTANCE;
+    }
+
+    static F64ConvertI32Unsigned f64_convert_i32_u() {
+        return F64ConvertI32Unsigned.INSTANCE;
+    }
+
+    static F64ConvertI64Signed f64_convert_i64_s() {
+        return F64ConvertI64Signed.INSTANCE;
+    }
+
+    static F64ConvertI64Unsigned f64_convert_i64_u() {
+        return F64ConvertI64Unsigned.INSTANCE;
+    }
+
+    static I32ReinterpretF32 i32_reinterpret_f32() {
+        return I32ReinterpretF32.INSTANCE;
+    }
+
+    static I32ReinterpretF64 i32_reinterpret_f64() {
+        return I32ReinterpretF64.INSTANCE;
+    }
+
+    static I64ReinterpretF32 i64_reinterpret_f32() {
+        return I64ReinterpretF32.INSTANCE;
+    }
+
+    static I64ReinterpretF64 i64_reinterpret_f64() {
+        return I64ReinterpretF64.INSTANCE;
+    }
+
+    static F32ReinterpretI32 f32_reinterpret_i32() {
+        return F32ReinterpretI32.INSTANCE;
+    }
+
+    static F32ReinterpretI64 f32_reinterpret_i64() {
+        return F32ReinterpretI64.INSTANCE;
+    }
+
+    static F64ReinterpretI32 f64_reinterpret_i32() {
+        return F64ReinterpretI32.INSTANCE;
+    }
+
+    static F64ReinterpretI64 f64_reinterpret_i64() {
+        return F64ReinterpretI64.INSTANCE;
     }
 }

@@ -16,4 +16,9 @@ public class CallIndirect implements ControlInstruction {
     public int typeIndex() {
         return typeIndex;
     }
+
+    @Override
+    public <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T {
+        visitor.visitCallIndirect(this);
+    }
 }

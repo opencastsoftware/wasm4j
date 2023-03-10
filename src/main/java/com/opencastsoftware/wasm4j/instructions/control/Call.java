@@ -10,4 +10,9 @@ public class Call implements ControlInstruction {
     public int funcIndex() {
         return funcIndex;
     }
+
+    @Override
+    public <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T {
+        visitor.visitCall(this);
+    }
 }

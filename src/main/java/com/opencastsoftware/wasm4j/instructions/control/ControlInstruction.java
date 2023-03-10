@@ -1,11 +1,18 @@
 package com.opencastsoftware.wasm4j.instructions.control;
 
 import com.opencastsoftware.wasm4j.instructions.Instruction;
+import com.opencastsoftware.wasm4j.instructions.InstructionVisitor;
 import com.opencastsoftware.wasm4j.types.BlockType;
 
 import java.util.List;
 
 public interface ControlInstruction extends Instruction {
+    <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T;
+
+    default <T extends Exception> void accept(InstructionVisitor<T> visitor) throws T {
+        accept((ControlInstructionVisitor<T>) visitor);
+    }
+
     static Nop nop() {
         return Nop.INSTANCE;
     }

@@ -10,4 +10,9 @@ public class BranchIf implements ControlInstruction {
     public int labelIndex() {
         return labelIndex;
     }
+
+    @Override
+    public <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T {
+        visitor.visitBranchIf(this);
+    }
 }

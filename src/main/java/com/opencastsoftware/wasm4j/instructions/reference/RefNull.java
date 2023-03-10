@@ -19,4 +19,9 @@ public class RefNull implements ReferenceInstruction, ConstantInstruction {
     public <T extends Exception> void accept(ConstantInstructionVisitor<T> visitor) throws T {
         visitor.visitRefNull(this);
     }
+
+    @Override
+    public <T extends Exception> void accept(ReferenceInstructionVisitor<T> visitor) throws T {
+        visitor.visitRefNull(this);
+    }
 }

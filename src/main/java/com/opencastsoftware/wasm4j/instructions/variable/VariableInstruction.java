@@ -1,6 +1,14 @@
 package com.opencastsoftware.wasm4j.instructions.variable;
 
+import com.opencastsoftware.wasm4j.instructions.InstructionVisitor;
+
 public interface VariableInstruction {
+    <T extends Exception> void accept(VariableInstructionVisitor<T> visitor) throws T;
+
+    default <T extends Exception> void accept(InstructionVisitor<T> visitor) throws T {
+        accept((VariableInstructionVisitor<T>) visitor);
+    }
+
     static LocalGet local_get(int localIndex) {
         return new LocalGet(localIndex);
     }

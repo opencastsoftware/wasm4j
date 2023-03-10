@@ -19,4 +19,9 @@ public class Select implements ParametricInstruction {
     public ValType valType() {
         return valType;
     }
+
+    @Override
+    public <T extends Exception> void accept(ParametricInstructionVisitor<T> visitor) throws T {
+        visitor.visitSelect(this);
+    }
 }

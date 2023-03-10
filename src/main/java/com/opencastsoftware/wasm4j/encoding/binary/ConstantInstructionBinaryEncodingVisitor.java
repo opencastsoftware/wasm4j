@@ -17,8 +17,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class ConstantInstructionBinaryEncodingVisitor implements ConstantInstructionVisitor<IOException> {
-    private final OutputStream output;
-    private final WasmTypeBinaryEncodingVisitor typeVisitor;
+    protected final OutputStream output;
+    protected final WasmTypeBinaryEncodingVisitor typeVisitor;
 
     public ConstantInstructionBinaryEncodingVisitor(OutputStream output, WasmTypeBinaryEncodingVisitor typeVisitor) {
         this.output = output;

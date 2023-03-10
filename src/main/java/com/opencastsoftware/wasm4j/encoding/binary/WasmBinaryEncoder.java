@@ -221,6 +221,7 @@ public class WasmBinaryEncoder implements WasmEncoder<IOException> {
                     LEB128.writeUnsigned(intermediate, active.tableIndex());
                     active.offset().accept(constExprVisitor);
                 } else {
+                    // For an non-active segment, bit 1 indicates whether this is a passive or declarative segment
                     if (elem.mode() instanceof Elem.Mode.Declarative) {
                         indicator = 0b111;
                     } else {

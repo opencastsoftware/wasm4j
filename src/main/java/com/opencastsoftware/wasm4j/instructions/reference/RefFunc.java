@@ -18,4 +18,9 @@ public class RefFunc implements ReferenceInstruction, ConstantInstruction {
     public <T extends Exception> void accept(ConstantInstructionVisitor<T> visitor) throws T {
         visitor.visitRefFunc(this);
     }
+
+    @Override
+    public <T extends Exception> void accept(ReferenceInstructionVisitor<T> visitor) throws T {
+        visitor.visitRefFunc(this);
+    }
 }

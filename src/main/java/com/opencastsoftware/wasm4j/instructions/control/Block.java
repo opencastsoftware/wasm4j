@@ -24,4 +24,9 @@ public class Block implements ControlInstruction {
     public List<Instruction> instructions() {
         return instructions;
     }
+
+    @Override
+    public <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T {
+        visitor.visitBlock(this);
+    }
 }

@@ -30,4 +30,9 @@ public class If implements ControlInstruction {
     public List<Instruction> alternative() {
         return alternative;
     }
+
+    @Override
+    public <T extends Exception> void accept(ControlInstructionVisitor<T> visitor) throws T {
+        visitor.visitIf(this);
+    }
 }
