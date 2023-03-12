@@ -6,7 +6,6 @@ import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
 import com.opencastsoftware.wasm4j.instructions.reference.ReferenceInstruction;
 import com.opencastsoftware.wasm4j.instructions.variable.VariableInstruction;
 import com.opencastsoftware.wasm4j.types.*;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;

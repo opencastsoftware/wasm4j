@@ -5,7 +5,6 @@ import com.opencastsoftware.wasm4j.Module;
 import com.opencastsoftware.wasm4j.types.FuncType;
 import com.opencastsoftware.wasm4j.types.MemType;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 

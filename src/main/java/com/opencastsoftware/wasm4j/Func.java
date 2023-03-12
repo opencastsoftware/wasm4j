@@ -1,6 +1,5 @@
 package com.opencastsoftware.wasm4j;
 
-import com.opencastsoftware.wasm4j.instructions.Instruction;
 import com.opencastsoftware.wasm4j.types.ValType;
 
 import java.util.List;

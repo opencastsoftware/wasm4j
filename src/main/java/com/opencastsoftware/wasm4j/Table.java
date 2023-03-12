@@ -1,9 +1,6 @@
 package com.opencastsoftware.wasm4j;
 
-import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
 import com.opencastsoftware.wasm4j.types.TableType;
-
-import java.util.List;
 
 public class Table {
     private final TableType type;

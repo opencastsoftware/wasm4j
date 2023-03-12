@@ -541,6 +541,10 @@ public interface NumericInstruction extends Instruction {
         return F32DemoteF64.INSTANCE;
     }
 
+    static F64PromoteF32 f64_promote_f32() {
+        return F64PromoteF32.INSTANCE;
+    }
+
     static F32ConvertI32Signed f32_convert_i32_s() {
         return F32ConvertI32Signed.INSTANCE;
     }
@@ -577,28 +581,12 @@ public interface NumericInstruction extends Instruction {
         return I32ReinterpretF32.INSTANCE;
     }
 
-    static I32ReinterpretF64 i32_reinterpret_f64() {
-        return I32ReinterpretF64.INSTANCE;
-    }
-
-    static I64ReinterpretF32 i64_reinterpret_f32() {
-        return I64ReinterpretF32.INSTANCE;
-    }
-
     static I64ReinterpretF64 i64_reinterpret_f64() {
         return I64ReinterpretF64.INSTANCE;
     }
 
     static F32ReinterpretI32 f32_reinterpret_i32() {
         return F32ReinterpretI32.INSTANCE;
-    }
-
-    static F32ReinterpretI64 f32_reinterpret_i64() {
-        return F32ReinterpretI64.INSTANCE;
-    }
-
-    static F64ReinterpretI32 f64_reinterpret_i32() {
-        return F64ReinterpretI32.INSTANCE;
     }
 
     static F64ReinterpretI64 f64_reinterpret_i64() {

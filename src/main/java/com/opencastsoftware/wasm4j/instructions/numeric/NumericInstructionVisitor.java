@@ -253,7 +253,7 @@ public interface NumericInstructionVisitor<T extends Exception> {
 
     void visitI32TruncF32Unsigned(I32TruncF32Unsigned i32TruncF32Unsigned) throws T;
 
-    void visitI32TruncF64Signed(I32TruncF64Signed i32TruncF64Signed);
+    void visitI32TruncF64Signed(I32TruncF64Signed i32TruncF64Signed) throws T;
 
     void visitI32TruncF64Unsigned(I32TruncF64Unsigned i32TruncF64Unsigned) throws T;
 
@@ -269,7 +269,7 @@ public interface NumericInstructionVisitor<T extends Exception> {
 
     void visitI32TruncSatF32Unsigned(I32TruncSatF32Unsigned i32TruncSatF32Unsigned) throws T;
 
-    void visitI32TruncSatF64Signed(I32TruncSatF64Signed i32TruncSatF64Signed);
+    void visitI32TruncSatF64Signed(I32TruncSatF64Signed i32TruncSatF64Signed) throws T;
 
     void visitI32TruncSatF64Unsigned(I32TruncSatF64Unsigned i32TruncSatF64Unsigned) throws T;
 
@@ -289,7 +289,7 @@ public interface NumericInstructionVisitor<T extends Exception> {
 
     void visitF32ConvertI32Unsigned(F32ConvertI32Unsigned f32ConvertI32Unsigned) throws T;
 
-    void visitF32ConvertI64Signed(F32ConvertI64Signed f32ConvertI64Signed);
+    void visitF32ConvertI64Signed(F32ConvertI64Signed f32ConvertI64Signed) throws T;
 
     void visitF32ConvertI64Unsigned(F32ConvertI64Unsigned f32ConvertI64Unsigned) throws T;
 
@@ -303,17 +303,9 @@ public interface NumericInstructionVisitor<T extends Exception> {
 
     void visitI32ReinterpretF32(I32ReinterpretF32 i32ReinterpretF32) throws T;
 
-    void visitI32ReinterpretF64(I32ReinterpretF64 i32ReinterpretF64) throws T;
-
-    void visitI64ReinterpretF32(I64ReinterpretF32 i64ReinterpretF32) throws T;
-
     void visitI64ReinterpretF64(I64ReinterpretF64 i64ReinterpretF64) throws T;
 
     void visitF32ReinterpretI32(F32ReinterpretI32 f32ReinterpretI32) throws T;
-
-    void visitF32ReinterpretI64(F32ReinterpretI64 f32ReinterpretI64) throws T;
-
-    void visitF64ReinterpretI32(F64ReinterpretI32 f64ReinterpretI32) throws T;
 
     void visitF64ReinterpretI64(F64ReinterpretI64 f64ReinterpretI64) throws T;
 }

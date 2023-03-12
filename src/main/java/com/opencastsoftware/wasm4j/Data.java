@@ -1,9 +1,5 @@
 package com.opencastsoftware.wasm4j;
 
-import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
-
-import java.util.List;
-
 public class Data {
     private final byte[] init;
     private final Mode mode;

@@ -1,10 +1,5 @@
 package com.opencastsoftware.wasm4j.instructions.memory;
 
-import com.opencastsoftware.wasm4j.instructions.ConstantInstruction;
-import com.opencastsoftware.wasm4j.instructions.ConstantInstructionVisitor;
-import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
-import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstructionVisitor;
-
 public class I32Load implements MemArgInstruction {
     private final int offset;
     private final int align;
