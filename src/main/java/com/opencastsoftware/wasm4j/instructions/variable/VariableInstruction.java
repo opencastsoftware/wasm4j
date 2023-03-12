@@ -1,8 +1,9 @@
 package com.opencastsoftware.wasm4j.instructions.variable;
 
+import com.opencastsoftware.wasm4j.instructions.Instruction;
 import com.opencastsoftware.wasm4j.instructions.InstructionVisitor;
 
-public interface VariableInstruction {
+public interface VariableInstruction extends Instruction {
     <T extends Exception> void accept(VariableInstructionVisitor<T> visitor) throws T;
 
     default <T extends Exception> void accept(InstructionVisitor<T> visitor) throws T {

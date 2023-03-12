@@ -5,6 +5,7 @@ import com.opencastsoftware.wasm4j.*;
 import com.opencastsoftware.wasm4j.encoding.WasmEncoder;
 import com.opencastsoftware.wasm4j.types.FuncType;
 import com.opencastsoftware.wasm4j.types.MemType;
+import com.opencastsoftware.wasm4j.types.ValType;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
@@ -250,13 +251,32 @@ public class WasmBinaryEncoder implements WasmEncoder<IOException> {
         }
     }
 
+    public void encodeFunc(OutputStream output, Func func) throws IOException {
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        // TODO: Use compressed encoding of locals here
+        LEB128.writeUnsigned(output, func.locals().size());
+        for (ValType localType : func.locals()) {
+            LEB128.writeUnsigned(output, 1);
+            localType.accept(typeVisitor);
+        }
+
+        func.body().accept(visitor);
+    }
+
     public void encodeCode(OutputStream output, List<Func> funcs) throws IOException {
         if (!funcs.isEmpty()) {
             var intermediate = new ByteArrayOutputStream();
 
             LEB128.writeUnsigned(intermediate, funcs.size());
             for (Func func : funcs) {
-                // TODO: Needs expression encoding visitor
+                var funcOutput = new ByteArrayOutputStream();
+                encodeFunc(funcOutput, func);
+                var funcBytes = funcOutput.toByteArray();
+
+                LEB128.writeUnsigned(intermediate, funcBytes.length);
+                intermediate.write(funcBytes);
             }
 
             encodeSection(output, SectionId.CODE, intermediate.toByteArray());

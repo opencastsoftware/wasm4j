@@ -1,8 +1,9 @@
 package com.opencastsoftware.wasm4j.instructions.memory;
 
+import com.opencastsoftware.wasm4j.instructions.Instruction;
 import com.opencastsoftware.wasm4j.instructions.InstructionVisitor;
 
-public interface MemoryInstruction {
+public interface MemoryInstruction extends Instruction {
     <T extends Exception> void accept(MemoryInstructionVisitor<T> visitor) throws T;
 
     default <T extends Exception> void accept(InstructionVisitor<T> visitor) throws T {

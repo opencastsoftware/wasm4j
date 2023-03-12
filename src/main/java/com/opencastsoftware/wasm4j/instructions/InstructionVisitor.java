@@ -1,5 +1,6 @@
 package com.opencastsoftware.wasm4j.instructions;
 
+import com.opencastsoftware.wasm4j.Expression;
 import com.opencastsoftware.wasm4j.instructions.control.ControlInstructionVisitor;
 import com.opencastsoftware.wasm4j.instructions.memory.MemoryInstructionVisitor;
 import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstructionVisitor;
@@ -12,4 +13,6 @@ public interface InstructionVisitor<T extends Exception> extends ControlInstruct
     default void visitInstruction(Instruction instruction) throws T {
         instruction.accept(this);
     }
+
+    void visitExpression(Expression expression) throws T;
 }

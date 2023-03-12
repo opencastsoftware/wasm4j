@@ -467,6 +467,64 @@ class WasmBinaryEncoderTest {
     }
 
     @Test
+    void testEncodeCode() throws IOException {
+        var encoder = new WasmBinaryEncoder();
+        var output = new ByteArrayOutputStream();
+
+        encoder.encodeCode(output, List.of(
+                new Func(0, List.of(NumType.i32()), Expression.of(
+                        VariableInstruction.local_get(0),
+                        VariableInstruction.local_get(0),
+                        NumericInstruction.i32_add())),
+                new Func(1, List.of(NumType.i32(), NumType.i32()), Expression.of(
+                        VariableInstruction.local_get(0),
+                        VariableInstruction.local_get(1),
+                        NumericInstruction.i32_add())),
+                new Func(2, List.of(NumType.i32(), NumType.i32()), Expression.of(
+                        VariableInstruction.local_get(0),
+                        VariableInstruction.local_get(1),
+                        NumericInstruction.i32_mul()))
+        ));
+
+        assertArrayEquals(new byte[]{
+                // Section ID
+                SectionId.CODE.id(),
+                // Section size (LEB128 u32)
+                0x23,
+                // Elements vec length (LEB128 u32)
+                0x03, // 3 entries
+                // Entry 1
+                0x09, // Entry 1 code size (LEB128 u32)
+                0x01, // Local variables vec length (LEB128 u32)
+                0x01, TypeOpcode.I32.opcode(), // Number of variables of this type, variable type
+                Opcode.LOCAL_GET.opcode(), 0x00,
+                Opcode.LOCAL_GET.opcode(), 0x00,
+                Opcode.I32_ADD.opcode(),
+                Opcode.END.opcode(),
+                // Entry 2
+                0x0B, // Entry 2 code size (LEB128 u32)
+                0x02, // Local variables vec length (LEB128 u32)
+                // TODO: Use compressed local variable declaration format
+                0x01, TypeOpcode.I32.opcode(), // Number of variables of this type, variable type
+                0x01, TypeOpcode.I32.opcode(), // Number of variables of this type, variable type
+                Opcode.LOCAL_GET.opcode(), 0x00,
+                Opcode.LOCAL_GET.opcode(), 0x01,
+                Opcode.I32_ADD.opcode(),
+                Opcode.END.opcode(),
+                // Entry 3
+                0x0B, // Entry 3 code size (LEB128 u32)
+                0x02, // Local variables vec length (LEB128 u32)
+                // TODO: Use compressed local variable declaration format
+                0x01, TypeOpcode.I32.opcode(), // Number of variables of this type, variable type
+                0x01, TypeOpcode.I32.opcode(), // Number of variables of this type, variable type
+                Opcode.LOCAL_GET.opcode(), 0x00,
+                Opcode.LOCAL_GET.opcode(), 0x01,
+                Opcode.I32_MUL.opcode(),
+                Opcode.END.opcode(),
+        }, output.toByteArray());
+    }
+
+    @Test
     void testEncodeEmptyData() throws IOException {
         var encoder = new WasmBinaryEncoder();
         var output = new ByteArrayOutputStream();

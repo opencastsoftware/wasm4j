@@ -1,8 +1,9 @@
 package com.opencastsoftware.wasm4j.instructions.table;
 
+import com.opencastsoftware.wasm4j.instructions.Instruction;
 import com.opencastsoftware.wasm4j.instructions.InstructionVisitor;
 
-public interface TableInstruction {
+public interface TableInstruction extends Instruction {
     <T extends Exception> void accept(TableInstructionVisitor<T> visitor) throws T;
 
     default <T extends Exception> void accept(InstructionVisitor<T> visitor) throws T {

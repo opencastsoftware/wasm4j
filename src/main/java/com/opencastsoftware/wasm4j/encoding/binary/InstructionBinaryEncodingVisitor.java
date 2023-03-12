@@ -1,5 +1,6 @@
 package com.opencastsoftware.wasm4j.encoding.binary;
 
+import com.opencastsoftware.wasm4j.Expression;
 import com.opencastsoftware.wasm4j.instructions.Instruction;
 import com.opencastsoftware.wasm4j.instructions.InstructionVisitor;
 import com.opencastsoftware.wasm4j.instructions.control.*;
@@ -1038,5 +1039,14 @@ public class InstructionBinaryEncodingVisitor extends ConstantInstructionBinaryE
     public void visitLocalTee(LocalTee localTee) throws IOException {
         output.write(Opcode.LOCAL_TEE.opcode());
         LEB128.writeUnsigned(output, localTee.localIndex());
+    }
+
+    @Override
+    public void visitExpression(Expression expression) throws IOException {
+        for (Instruction instr: expression.instructions()) {
+            instr.accept(this);
+        }
+
+        output.write(Opcode.END.opcode());
     }
 }
