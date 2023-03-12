@@ -956,73 +956,87 @@ public class InstructionBinaryEncodingVisitor extends ConstantInstructionBinaryE
     // Reference instructions
     @Override
     public void visitRefAsNonNull(RefAsNonNull refAsNonNull) throws IOException {
-
+        output.write(Opcode.REF_AS_NON_NULL.opcode());
     }
 
     @Override
     public void visitRefIsNull(RefIsNull refIsNull) throws IOException {
-
+        output.write(Opcode.REF_IS_NULL.opcode());
     }
 
     // Table instructions
     @Override
     public void visitTableGet(TableGet tableGet) throws IOException {
-
+        output.write(Opcode.TABLE_GET.opcode());
+        LEB128.writeUnsigned(output, tableGet.tableIndex());
     }
 
     @Override
     public void visitTableSet(TableSet tableSet) throws IOException {
-
+        output.write(Opcode.TABLE_SET.opcode());
+        LEB128.writeUnsigned(output, tableSet.tableIndex());
     }
 
     @Override
     public void visitTableSize(TableSize tableSize) throws IOException {
-
+        output.write(Opcode.TABLE_SIZE.bytes());
+        LEB128.writeUnsigned(output, tableSize.tableIndex());
     }
 
     @Override
     public void visitTableGrow(TableGrow tableGrow) throws IOException {
-
+        output.write(Opcode.TABLE_GROW.bytes());
+        LEB128.writeUnsigned(output, tableGrow.tableIndex());
     }
 
     @Override
     public void visitTableFill(TableFill tableFill) throws IOException {
-
+        output.write(Opcode.TABLE_FILL.bytes());
+        LEB128.writeUnsigned(output, tableFill.tableIndex());
     }
 
     @Override
     public void visitTableCopy(TableCopy tableCopy) throws IOException {
-
+        output.write(Opcode.TABLE_COPY.bytes());
+        LEB128.writeUnsigned(output, tableCopy.targetTableIndex());
+        LEB128.writeUnsigned(output, tableCopy.sourceTableIndex());
     }
 
     @Override
     public void visitTableInit(TableInit tableInit) throws IOException {
-
+        output.write(Opcode.TABLE_INIT.bytes());
+        LEB128.writeUnsigned(output, tableInit.elemIndex());
+        LEB128.writeUnsigned(output, tableInit.tableIndex());
     }
 
     @Override
     public void visitElemDrop(ElemDrop elemDrop) throws IOException {
-
+        output.write(Opcode.ELEM_DROP.bytes());
+        LEB128.writeUnsigned(output, elemDrop.elemIndex());
     }
 
     // Variable instructions
     @Override
     public void visitGlobalSet(GlobalSet globalSet) throws IOException {
-
+        output.write(Opcode.GLOBAL_SET.opcode());
+        LEB128.writeUnsigned(output, globalSet.globalIndex());
     }
 
     @Override
     public void visitLocalGet(LocalGet localGet) throws IOException {
-
+        output.write(Opcode.LOCAL_GET.opcode());
+        LEB128.writeUnsigned(output, localGet.localIndex());
     }
 
     @Override
     public void visitLocalSet(LocalSet localSet) throws IOException {
-
+        output.write(Opcode.LOCAL_SET.opcode());
+        LEB128.writeUnsigned(output, localSet.localIndex());
     }
 
     @Override
     public void visitLocalTee(LocalTee localTee) throws IOException {
-
+        output.write(Opcode.LOCAL_TEE.opcode());
+        LEB128.writeUnsigned(output, localTee.localIndex());
     }
 }

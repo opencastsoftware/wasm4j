@@ -4,6 +4,9 @@ import com.opencastsoftware.wasm4j.instructions.control.ControlInstruction;
 import com.opencastsoftware.wasm4j.instructions.memory.MemoryInstruction;
 import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
 import com.opencastsoftware.wasm4j.instructions.parametric.ParametricInstruction;
+import com.opencastsoftware.wasm4j.instructions.reference.ReferenceInstruction;
+import com.opencastsoftware.wasm4j.instructions.table.TableInstruction;
+import com.opencastsoftware.wasm4j.instructions.variable.VariableInstruction;
 import com.opencastsoftware.wasm4j.types.HeapType;
 import com.opencastsoftware.wasm4j.types.NumType;
 import com.opencastsoftware.wasm4j.types.RefType;
@@ -195,15 +198,16 @@ public class InstructionBinaryEncodingVisitorTest {
         var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
         var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
 
-        ControlInstruction.loop(List.of(
+        ControlInstruction.loop(
                 ControlInstruction.call(1),
                 ControlInstruction.br(0)
-        )).accept(visitor);
+        ).accept(visitor);
 
-        ControlInstruction.loop(NumType.i32(), List.of(
+        ControlInstruction.loop(
+                NumType.i32(),
                 ControlInstruction.call(1),
                 ControlInstruction.br(0)
-        )).accept(visitor);
+        ).accept(visitor);
 
         assertArrayEquals(new byte[]{
                 Opcode.LOOP.opcode(), 0x40, // Empty type
@@ -250,6 +254,7 @@ public class InstructionBinaryEncodingVisitorTest {
         assertArrayEquals(Opcode.UNREACHABLE.bytes(), output.toByteArray());
     }
 
+    // Numeric instructions
     @Test
     void testI32LoadEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
@@ -1919,6 +1924,7 @@ public class InstructionBinaryEncodingVisitorTest {
         assertArrayEquals(Opcode.F64_REINTERPRET_I64.bytes(), output.toByteArray());
     }
 
+    // Parametric instructions
     @Test
     void testDropEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
@@ -1939,11 +1945,191 @@ public class InstructionBinaryEncodingVisitorTest {
         ParametricInstruction.select().accept(visitor);
         ParametricInstruction.select(NumType.i32()).accept(visitor);
 
-        assertArrayEquals(new byte[] {
-            Opcode.SELECT.opcode(),
-            Opcode.SELECT_TYPE.opcode(),
-            0x01, // Select operand types vec length (LEB128 u32)
-            TypeOpcode.I32.opcode()
+        assertArrayEquals(new byte[]{
+                Opcode.SELECT.opcode(),
+                Opcode.SELECT_TYPE.opcode(),
+                0x01, // Select operand types vec length (LEB128 u32)
+                TypeOpcode.I32.opcode()
         }, output.toByteArray());
+    }
+
+    @Test
+    void testRefAsNonNullEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        ReferenceInstruction.ref_as_non_null().accept(visitor);
+
+        assertArrayEquals(Opcode.REF_AS_NON_NULL.bytes(), output.toByteArray());
+    }
+
+    @Test
+    void testRefIsNullEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        ReferenceInstruction.ref_is_null().accept(visitor);
+
+        assertArrayEquals(Opcode.REF_IS_NULL.bytes(), output.toByteArray());
+    }
+
+    // Table instructions
+    @Test
+    void testTableGetEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.table_get(32).accept(visitor);
+
+        assertArrayEquals(new byte[]{Opcode.TABLE_GET.opcode(), 0x20}, output.toByteArray());
+    }
+
+    @Test
+    void testTableSetEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.table_set(2).accept(visitor);
+
+        assertArrayEquals(new byte[]{Opcode.TABLE_SET.opcode(), 0x02}, output.toByteArray());
+    }
+
+    @Test
+    void testTableSizeEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.table_size(4).accept(visitor);
+
+        assertArrayEquals(new byte[]{
+                Opcode.TABLE_SIZE.bytes()[0],
+                Opcode.TABLE_SIZE.bytes()[1],
+                0x04
+        }, output.toByteArray());
+    }
+
+    @Test
+    void testTableGrowEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.table_grow(8).accept(visitor);
+
+        assertArrayEquals(new byte[]{
+                Opcode.TABLE_GROW.bytes()[0],
+                Opcode.TABLE_GROW.bytes()[1],
+                0x08
+        }, output.toByteArray());
+    }
+
+    @Test
+    void testTableFillEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.table_fill(16).accept(visitor);
+
+        assertArrayEquals(new byte[]{
+                Opcode.TABLE_FILL.bytes()[0],
+                Opcode.TABLE_FILL.bytes()[1],
+                0x10
+        }, output.toByteArray());
+    }
+
+    @Test
+    void testTableCopyEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.table_copy(16, 32).accept(visitor);
+
+        assertArrayEquals(new byte[]{
+                Opcode.TABLE_COPY.bytes()[0],
+                Opcode.TABLE_COPY.bytes()[1],
+                0x10, 0x20
+        }, output.toByteArray());
+    }
+
+    @Test
+    void testTableInitEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.table_init(16, 32).accept(visitor);
+
+        assertArrayEquals(new byte[]{
+                Opcode.TABLE_INIT.bytes()[0],
+                Opcode.TABLE_INIT.bytes()[1],
+                0x20, 0x10
+        }, output.toByteArray());
+    }
+
+    @Test
+    void testElemDropEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        TableInstruction.elem_drop(32).accept(visitor);
+
+        assertArrayEquals(new byte[]{
+                Opcode.ELEM_DROP.bytes()[0],
+                Opcode.ELEM_DROP.bytes()[1],
+                0x20
+        }, output.toByteArray());
+    }
+
+    // Variable instructions
+    @Test
+    void testGlobalSetEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        VariableInstruction.global_set(5).accept(visitor);
+
+        assertArrayEquals(new byte[]{Opcode.GLOBAL_SET.opcode(), 0x05}, output.toByteArray());
+    }
+
+    @Test
+    void testLocalGetEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        VariableInstruction.local_get(7).accept(visitor);
+
+        assertArrayEquals(new byte[]{Opcode.LOCAL_GET.opcode(), 0x07}, output.toByteArray());
+    }
+
+    @Test
+    void testLocalSetEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        VariableInstruction.local_set(6).accept(visitor);
+
+        assertArrayEquals(new byte[]{Opcode.LOCAL_SET.opcode(), 0x06}, output.toByteArray());
+    }
+
+    @Test
+    void testLocalTeeEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var typeVisitor = new WasmTypeBinaryEncodingVisitor(output);
+        var visitor = new InstructionBinaryEncodingVisitor(output, typeVisitor);
+
+        VariableInstruction.local_tee(3).accept(visitor);
+
+        assertArrayEquals(new byte[]{Opcode.LOCAL_TEE.opcode(), 0x03}, output.toByteArray());
     }
 }
