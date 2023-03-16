@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Install WABT
-        run: apt-get -y install wabt
+        run: sudo apt-get -y install wabt
 
       - name: Checkout
         uses: actions/checkout@v3
