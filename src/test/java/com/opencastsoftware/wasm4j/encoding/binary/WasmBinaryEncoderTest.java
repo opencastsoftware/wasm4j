@@ -577,7 +577,7 @@ class WasmBinaryEncoderTest {
 
         assertArrayEquals(new byte[]{
                 // WASM magic
-                0x00, 0x61, 0x73, 0x6D,
+                0x00, 0x61, 0x71, 0x6D,
                 // WASM binary format version
                 0x01, 0x00, 0x00, 0x00
         }, output.toByteArray());
