@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class WasmBinaryEncoder implements WasmEncoder<IOException> {
-    static final byte[] WASM_MAGIC = new byte[]{0x00, 0x61, 0x71, 0x6D};
+    static final byte[] WASM_MAGIC = new byte[]{0x00, 0x61, 0x73, 0x6D};
     static final byte[] WASM_BINARY_FORMAT_VERSION = new byte[]{0x01, 0x00, 0x00, 0x00};
 
     private void encodeSection(OutputStream output, SectionId sectionId, byte[] content) throws IOException {

@@ -1,4 +1,5 @@
 [versions]
+apacheCommonsLang = "3.12.0"
 gradleJavaConventions = "0.1.0"
 equalsVerifier = "3.14"
 hamcrest = "2.2"
@@ -9,6 +10,7 @@ junitJupiter = "5.9.1"
 toStringVerifier = "1.4.8"
 
 [libraries]
+apacheCommonsLang = { module = "org.apache.commons:commons-lang3", version.ref = "apacheCommonsLang" }
 equalsVerifier = { module = "nl.jqno.equalsverifier:equalsverifier", version.ref = "equalsVerifier" }
 hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 jetBrainsAnnotations = { module = "org.jetbrains:annotations", version.ref = "jetBrainsAnnotations" }

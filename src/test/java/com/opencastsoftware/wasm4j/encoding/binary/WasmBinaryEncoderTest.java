@@ -553,18 +553,18 @@ class WasmBinaryEncoderTest {
                 // Entry 1
                 0x01, // Passive data segment
                 0x04, // Data length
-                0x00, 0x61, 0x71, 0x6D, // Data
+                0x00, 0x61, 0x73, 0x6D, // Data
                 // Entry 2
                 0x00, // Active data segment without explicit memory index
                 Opcode.I32_CONST.opcode(), 0x00, Opcode.END.opcode(), // Offset expression
                 0x04, // Data length
-                0x00, 0x61, 0x71, 0x6D, // Data
+                0x00, 0x61, 0x73, 0x6D, // Data
                 // Entry 3
                 0x02, // Active data segment with explicit memory index
                 0x01, // Memory index
                 Opcode.I32_CONST.opcode(), 0x01, Opcode.END.opcode(), // Offset expression
                 0x04, // Data length
-                0x00, 0x61, 0x71, 0x6D, // Data
+                0x00, 0x61, 0x73, 0x6D, // Data
         }, output.toByteArray());
     }
 
@@ -577,7 +577,7 @@ class WasmBinaryEncoderTest {
 
         assertArrayEquals(new byte[]{
                 // WASM magic
-                0x00, 0x61, 0x71, 0x6D,
+                0x00, 0x61, 0x73, 0x6D,
                 // WASM binary format version
                 0x01, 0x00, 0x00, 0x00
         }, output.toByteArray());

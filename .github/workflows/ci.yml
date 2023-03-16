@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install WABT
+        run: apt-get -y install wabt
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
