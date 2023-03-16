@@ -3,21 +3,25 @@ package com.opencastsoftware.wasm4j.instructions.parametric;
 import com.opencastsoftware.wasm4j.types.ValType;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 public class Select implements ParametricInstruction {
-    @Nullable
-    private final ValType valType;
+    private final List<ValType> valTypes;
 
     public Select(@Nullable ValType valType) {
-        this.valType = valType;
+        this.valTypes = Optional.ofNullable(valType)
+                .map(List::of)
+                .orElseGet(Collections::emptyList);
     }
 
     public Select() {
-        this.valType = null;
+        this.valTypes = Collections.emptyList();
     }
 
-    @Nullable
-    public ValType valType() {
-        return valType;
+    public List<ValType> valTypes() {
+        return valTypes;
     }
 
     @Override

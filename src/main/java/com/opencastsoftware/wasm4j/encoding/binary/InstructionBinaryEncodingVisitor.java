@@ -945,12 +945,14 @@ public class InstructionBinaryEncodingVisitor extends ConstantInstructionBinaryE
 
     @Override
     public void visitSelect(Select select) throws IOException {
-        if (select.valType() != null) {
-            output.write(Opcode.SELECT_TYPE.opcode());
-            LEB128.writeUnsigned(output, 1);
-            select.valType().accept(typeVisitor);
-        } else {
+        if (select.valTypes().isEmpty()) {
             output.write(Opcode.SELECT.opcode());
+        } else {
+            output.write(Opcode.SELECT_TYPE.opcode());
+            LEB128.writeUnsigned(output, select.valTypes().size());
+            for (ValType valType : select.valTypes()) {
+                valType.accept(typeVisitor);
+            }
         }
     }
 
