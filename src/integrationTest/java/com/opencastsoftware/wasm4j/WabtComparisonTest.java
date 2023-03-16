@@ -1,6 +1,8 @@
 package com.opencastsoftware.wasm4j;
 
 import com.opencastsoftware.wasm4j.encoding.binary.WasmBinaryEncoder;
+import com.opencastsoftware.wasm4j.instructions.numeric.NumericInstruction;
+import com.opencastsoftware.wasm4j.instructions.variable.VariableInstruction;
 import com.opencastsoftware.wasm4j.types.ExternType;
 import com.opencastsoftware.wasm4j.types.NumType;
 import org.apache.commons.lang3.function.FailableConsumer;
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +54,10 @@ public class WabtComparisonTest {
 
         assertThat(errorOutput, is(emptyString()));
         assertThat(wasm2wat.exitValue(), is(0));
-        assertThat(watOutput.replaceAll("\\s+", " "), is(equalToCompressingWhiteSpace(expected)));
+
+        assertThat(
+                watOutput.replaceAll("\\s+", " "),
+                is(equalTo(expected.replaceAll("\\s+", " "))));
     }
 
     @Test
@@ -71,6 +77,37 @@ public class WabtComparisonTest {
         var fileName = "singletype.wasm";
         withBinaryFile(fileName, module, wasmFile -> {
             assertWasm2WatEquals(fileName, wasmFile, "(module (type (;0;) (func (param i32) (result i32))))");
+        });
+    }
+
+    @Test
+    void moduleWithAddFunctionMatchesWabt() throws Exception {
+        var module = Module.empty();
+
+        // (i32, i32) -> i32
+        var intToIntType = ExternType.func(List.of(NumType.i32(), NumType.i32()), List.of(NumType.i32()));
+
+        module.types().add(intToIntType);
+
+        module.funcs().add(new Func(
+                0,
+                Collections.emptyList(),
+                Expression.of(
+                        VariableInstruction.local_get(0),
+                        VariableInstruction.local_get(1),
+                        NumericInstruction.i32_add()
+                )));
+
+        var fileName = "addfunction.wasm";
+
+        withBinaryFile(fileName, module, wasmFile -> {
+            assertWasm2WatEquals(fileName, wasmFile,
+                    String.join(System.lineSeparator(),
+                            "(module",
+                            "(type (;0;) (func (param i32 i32) (result i32)))",
+                            "(func (;0;) (type 0) (param i32 i32) (result i32) local.get 0 local.get 1 i32.add))"
+                    )
+            );
         });
     }
 }
