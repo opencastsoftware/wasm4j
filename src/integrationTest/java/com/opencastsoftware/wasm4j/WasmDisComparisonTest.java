@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-public class Wasm2WatComparisonTest {
+public class WasmDisComparisonTest {
     @TempDir
     Path tmpDir;
 
@@ -38,29 +38,27 @@ public class Wasm2WatComparisonTest {
         }
     }
 
-    private void assertWasm2WatEquals(String fileName, Path wasmFile, String expected) throws IOException, InterruptedException {
-        var wasm2wat = new ProcessBuilder("wasm2wat", fileName)
+    private void assertWasmDisEquals(String fileName, String expected) throws IOException, InterruptedException {
+        var wasmdis = new ProcessBuilder("wasm-dis", fileName)
                 .directory(tmpDir.toFile())
                 .start();
 
-        wasm2wat.waitFor();
+        wasmdis.waitFor();
 
-        var watOutput = new BufferedReader(new InputStreamReader(wasm2wat.getInputStream()))
+        var watOutput = new BufferedReader(new InputStreamReader(wasmdis.getInputStream()))
                 .lines()
                 .collect(Collectors.joining(System.lineSeparator()));
 
-        var errorOutput = new BufferedReader(new InputStreamReader(wasm2wat.getErrorStream()))
+        var errorOutput = new BufferedReader(new InputStreamReader(wasmdis.getErrorStream()))
                 .lines()
                 .collect(Collectors.joining(System.lineSeparator()));
 
         System.err.println(errorOutput);
 
         assertThat(errorOutput, is(emptyString()));
-        assertThat(wasm2wat.exitValue(), is(0));
+        assertThat(wasmdis.exitValue(), is(0));
 
-        assertThat(
-                watOutput.replaceAll("\\s+", " "),
-                is(equalTo(expected.replaceAll("\\s+", " "))));
+        assertThat(watOutput, is(equalTo(expected)));
     }
 
     @Test
@@ -68,7 +66,12 @@ public class Wasm2WatComparisonTest {
         var module = Module.empty();
         var fileName = "empty.wasm";
         withBinaryFile(fileName, module, wasmFile -> {
-            assertWasm2WatEquals(fileName, wasmFile, "(module)");
+            assertWasmDisEquals(fileName,
+                    String.join(
+                            System.lineSeparator(),
+                            "(module",
+                            ")",
+                            ""));
         });
     }
 
@@ -78,7 +81,11 @@ public class Wasm2WatComparisonTest {
         var module = Module.builder().withType(intToIntType).build();
         var fileName = "singletype.wasm";
         withBinaryFile(fileName, module, wasmFile -> {
-            assertWasm2WatEquals(fileName, wasmFile, "(module (type (;0;) (func (param i32) (result i32))))");
+            // It seems that wasm-dis strips out unused types
+            assertWasmDisEquals(fileName, String.join(System.lineSeparator(),
+                    "(module",
+                    ")",
+                    ""));
         });
     }
 
@@ -94,15 +101,21 @@ public class Wasm2WatComparisonTest {
                         NumericInstruction.i32_add()
                 )).build();
 
-
         var fileName = "addfunction.wasm";
 
         withBinaryFile(fileName, module, wasmFile -> {
-            assertWasm2WatEquals(fileName, wasmFile,
+            assertWasmDisEquals(fileName,
                     String.join(System.lineSeparator(),
                             "(module",
-                            "(type (;0;) (func (param i32 i32) (result i32)))",
-                            "(func (;0;) (type 0) (param i32 i32) (result i32) local.get 0 local.get 1 i32.add))"
+                            " (type $i32_i32_=>_i32 (func (param i32 i32) (result i32)))",
+                            " (func $0 (param $0 i32) (param $1 i32) (result i32)",
+                            "  (i32.add",
+                            "   (local.get $0)",
+                            "   (local.get $1)",
+                            "  )",
+                            " )",
+                            ")",
+                            ""
                     )
             );
         });
@@ -121,16 +134,43 @@ public class Wasm2WatComparisonTest {
         var fileName = "startfunction.wasm";
 
         withBinaryFile(fileName, module, wasmFile -> {
-            assertWasm2WatEquals(fileName, wasmFile,
+            assertWasmDisEquals(fileName,
                     String.join(System.lineSeparator(),
                             "(module",
-                            "(type (;0;) (func))",
-                            "(func (;0;) (type 0) nop)",
-                            "(start 0))"
+                            " (type $none_=>_none (func))",
+                            " (start $0)",
+                            " (func $0",
+                            "  (nop)",
+                            " )",
+                            ")",
+                            ""
                     )
             );
         });
     }
+
+    @Disabled("Neither wasm-dis nor wasm2wat support the new table definition encoding with init expression")
+    @Test
+    void moduleWithTable() throws Exception {
+        var module = Module.builder()
+                .withTables(new Table(
+                        ExternType.table(Limits.of(1), RefType.nullable(HeapType.func())),
+                        ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.func()))))
+                .build();
+
+        var fileName = "table.wasm";
+
+        withBinaryFile(fileName, module, wasmFile -> {
+            assertWasmDisEquals(fileName,
+                    String.join(
+                            System.lineSeparator(),
+                            "(module",
+                            " (memory $0 1)",
+                            ")",
+                            ""));
+        });
+    }
+
 
     @Test
     void moduleWithUnboundedMemory() throws Exception {
@@ -141,7 +181,13 @@ public class Wasm2WatComparisonTest {
         var fileName = "unboundedmem.wasm";
 
         withBinaryFile(fileName, module, wasmFile -> {
-            assertWasm2WatEquals(fileName, wasmFile, "(module (memory (;0;) 1))");
+            assertWasmDisEquals(fileName,
+                    String.join(
+                            System.lineSeparator(),
+                            "(module",
+                            " (memory $0 1)",
+                            ")",
+                            ""));
         });
     }
 
@@ -154,7 +200,13 @@ public class Wasm2WatComparisonTest {
         var fileName = "boundedmem.wasm";
 
         withBinaryFile(fileName, module, wasmFile -> {
-            assertWasm2WatEquals(fileName, wasmFile, "(module (memory (;0;) 1 5))");
+            assertWasmDisEquals(fileName,
+                    String.join(
+                            System.lineSeparator(),
+                            "(module",
+                            " (memory $0 1 5)",
+                            ")",
+                            ""));
         });
     }
 
@@ -164,14 +216,24 @@ public class Wasm2WatComparisonTest {
                 .withGlobals(
                         new Global(
                                 ExternType.global(false, NumType.i32()),
-                                ConstantExpression.of(NumericInstruction.i32_const(1)))
+                                ConstantExpression.of(NumericInstruction.i32_const(1))),
+                        new Global(
+                                ExternType.global(true, RefType.nullable(HeapType.func())),
+                                ConstantExpression.of(ReferenceInstruction.ref_null(HeapType.func())))
                 )
                 .build();
 
         var fileName = "globals.wasm";
 
         withBinaryFile(fileName, module, wasmFile -> {
-            assertWasm2WatEquals(fileName, wasmFile, "(module (global (;0;) i32 (i32.const 1)))");
+            assertWasmDisEquals(fileName,
+                    String.join(System.lineSeparator(),
+                            "(module",
+                            " (global $global$0 i32 (i32.const 1))",
+                            " (global $global$1 (mut funcref) (ref.null nofunc))",
+                            ")",
+                            ""
+                    ));
         });
     }
 }

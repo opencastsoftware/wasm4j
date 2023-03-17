@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install WABT
-        run: sudo apt-get -y install wabt
+      - name: Install Binaryen
+        run: sudo apt-get -y install binaryen
 
       - name: Checkout
         uses: actions/checkout@v3
