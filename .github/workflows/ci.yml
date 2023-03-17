@@ -16,7 +16,12 @@ jobs:
 
     steps:
       - name: Install Binaryen
-        run: sudo apt-get -y install binaryen
+        uses: jaxxstorm/action-install-gh-release@v1
+        with:
+          repo: WebAssembly/binaryen
+          tag: version_112
+          cache: enable
+          binaries-location: bin
 
       - name: Checkout
         uses: actions/checkout@v3
