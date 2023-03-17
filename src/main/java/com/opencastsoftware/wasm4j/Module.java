@@ -2,9 +2,11 @@ package com.opencastsoftware.wasm4j;
 
 import com.opencastsoftware.wasm4j.types.FuncType;
 import com.opencastsoftware.wasm4j.types.MemType;
+import com.opencastsoftware.wasm4j.types.ValType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Module {
@@ -50,6 +52,10 @@ public class Module {
         return new Module();
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public List<FuncType> types() {
         return types;
     }
@@ -89,5 +95,149 @@ public class Module {
 
     public List<Export> exports() {
         return exports;
+    }
+
+    public static class Builder {
+        private final List<FuncType> types = new ArrayList<>();
+        private final List<Func> funcs = new ArrayList<>();
+        private final List<Table> tables = new ArrayList<>();
+        private final List<MemType> mems = new ArrayList<>();
+        private final List<Global> globals = new ArrayList<>();
+        private final List<Elem> elems = new ArrayList<>();
+        private final List<Data> datas = new ArrayList<>();
+        @Nullable
+        private Integer start = null;
+        private final List<Import> imports = new ArrayList<>();
+        private final List<Export> exports = new ArrayList<>();
+
+        public Builder withType(FuncType type) {
+            this.types.add(type);
+
+            return this;
+        }
+
+        public Builder withFunc(FuncType type, Expression body) {
+            withFunc(type, Collections.emptyList(), body);
+
+            return this;
+        }
+
+        public Builder withFunc(FuncType type, List<ValType> locals, Expression body) {
+            int typeIndex = this.types.size();
+            this.types.add(type);
+            this.funcs.add(new Func(typeIndex, locals, body));
+
+            return this;
+        }
+
+        public Builder withTables(Table... tables) {
+            for (Table table : tables) {
+                withTable(table);
+            }
+
+            return this;
+        }
+
+        public Builder withTable(Table table) {
+            this.tables.add(table);
+
+            return this;
+        }
+
+        public Builder withMemories(MemType... mems) {
+            for (MemType mem : mems) {
+                withMemory(mem);
+            }
+
+            return this;
+        }
+
+        public Builder withMemory(MemType mem) {
+            this.mems.add(mem);
+
+            return this;
+        }
+
+        public Builder withGlobals(Global... globals) {
+            for (Global global : globals) {
+                withGlobal(global);
+            }
+
+            return this;
+        }
+
+        public Builder withGlobal(Global global) {
+            this.globals.add(global);
+
+            return this;
+        }
+
+
+        public Builder withElems(Elem... elems) {
+            for (Elem elem : elems) {
+                withElem(elem);
+            }
+
+            return this;
+        }
+
+        public Builder withElem(Elem elem) {
+            this.elems.add(elem);
+
+            return this;
+        }
+
+        public Builder withDatas(Data... datas) {
+            for (Data data : datas) {
+                withData(data);
+            }
+
+            return this;
+        }
+
+        public Builder withData(Data data) {
+            this.datas.add(data);
+
+            return this;
+        }
+
+        public Builder withStart(@Nullable Integer start) {
+            this.start = start;
+
+            return this;
+        }
+
+        public Builder withImports(Import... imports) {
+            for (Import imp : imports) {
+                withImport(imp);
+            }
+
+            return this;
+        }
+
+        public Builder withImport(Import imp) {
+            this.imports.add(imp);
+
+            return this;
+        }
+
+        public Builder withExports(Export... exports) {
+            for (Export exp : exports) {
+                withExport(exp);
+            }
+
+            return this;
+        }
+
+        public Builder withExport(Export exp) {
+            this.exports.add(exp);
+
+            return this;
+        }
+
+        public Module build() {
+            return new Module(types, funcs, tables, mems, globals, elems, datas, start, imports, exports);
+        }
+
     }
 }
