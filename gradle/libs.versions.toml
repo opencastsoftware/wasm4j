@@ -1,6 +1,6 @@
 [versions]
 apacheCommonsLang = "3.12.0"
-gradleJavaConventions = "0.1.0"
+gradleJavaConventions = "0.1.2"
 equalsVerifier = "3.14"
 hamcrest = "2.2"
 jacoco = "0.8.8"
