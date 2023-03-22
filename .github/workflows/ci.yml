@@ -20,7 +20,6 @@ jobs:
         with:
           repo: WebAssembly/binaryen
           tag: version_112
-          cache: enable
           binaries-location: binaryen-version_112/bin
 
       - name: Checkout
