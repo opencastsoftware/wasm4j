@@ -21,10 +21,10 @@ jobs:
           repo: WebAssembly/binaryen
           tag: version_112
           cache: enable
-          binaries-location: bin
+          binaries-location: binaryen-version_112/bin
 
-      - run: ls /opt/hostedtoolcache/WebAssembly/binaryen/version_112/linux-x64
-        if: always()
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
 
       - name: Checkout
         uses: actions/checkout@v3
