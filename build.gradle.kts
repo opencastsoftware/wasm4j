@@ -4,11 +4,10 @@ plugins {
 }
 
 group = "com.opencastsoftware"
+
 description = "WebAssembly toolkit for Java"
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
-}
+java { toolchain.languageVersion.set(JavaLanguageVersion.of(11)) }
 
 dependencies {
     compileOnly(libs.jetBrainsAnnotations)
@@ -62,26 +61,21 @@ mavenPublishing {
     }
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform {
-        includeEngines("junit-jupiter", "jqwik")
-    }
-}
+tasks.named<Test>("test") { useJUnitPlatform { includeEngines("junit-jupiter", "jqwik") } }
 
 // Create an integration test source set and configuration
 testing {
     suites {
-        val integrationTest by registering(JvmTestSuite::class) {
-            dependencies {
-                implementation(project())
-                implementation(libs.apacheCommonsLang)
-                implementation(libs.junitJupiter)
-                implementation(libs.hamcrest)
+        val integrationTest by
+            registering(JvmTestSuite::class) {
+                dependencies {
+                    implementation(project())
+                    implementation(libs.apacheCommonsLang)
+                    implementation(libs.junitJupiter)
+                    implementation(libs.hamcrest)
+                }
             }
-        }
     }
 }
 
-tasks.check {
-    dependsOn(testing.suites.named("integrationTest"))
-}
+tasks.check { dependsOn(testing.suites.named("integrationTest")) }
