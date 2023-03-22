@@ -5,7 +5,7 @@ equalsVerifier = "3.14"
 hamcrest = "2.2"
 jacoco = "0.8.8"
 jetBrainsAnnotations = "24.0.1"
-jqwik = "1.7.2"
+jqwik = "1.7.3"
 junitJupiter = "5.9.1"
 toStringVerifier = "1.4.8"
 
