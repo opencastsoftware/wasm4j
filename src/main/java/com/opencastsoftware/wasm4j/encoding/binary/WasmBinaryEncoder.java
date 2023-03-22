@@ -1,7 +1,11 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.wasm4j.encoding.binary;
 
-import com.opencastsoftware.wasm4j.Module;
 import com.opencastsoftware.wasm4j.*;
+import com.opencastsoftware.wasm4j.Module;
 import com.opencastsoftware.wasm4j.encoding.WasmEncoder;
 import com.opencastsoftware.wasm4j.types.FuncType;
 import com.opencastsoftware.wasm4j.types.MemType;
