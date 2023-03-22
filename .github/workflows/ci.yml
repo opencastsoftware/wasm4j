@@ -24,6 +24,7 @@ jobs:
           binaries-location: bin
 
       - run: ls /opt/hostedtoolcache/WebAssembly/binaryen/version_112/linux-x64
+        if: always()
 
       - name: Checkout
         uses: actions/checkout@v3
