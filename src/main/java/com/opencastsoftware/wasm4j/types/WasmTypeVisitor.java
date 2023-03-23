@@ -4,6 +4,8 @@
  */
 package com.opencastsoftware.wasm4j.types;
 
+import java.lang.reflect.Array;
+
 public interface WasmTypeVisitor<T extends Exception> {
 
     default void visitType(WasmType type) throws T {
@@ -20,6 +22,22 @@ public interface WasmTypeVisitor<T extends Exception> {
     void visitHeapFunc(HeapFuncType heapFunc) throws T;
 
     void visitHeapExtern(HeapExternType heapExtern) throws T;
+
+    void visitAnyType(AnyType any) throws T;
+
+    void visitNoneType(NoneType none) throws T;
+
+    void visitNoExternType(NoExternType noExtern) throws T;
+
+    void visitNoFuncType(NoFuncType noFunc) throws T;
+
+    void visitEqType(EqType eq) throws T;
+
+    void visitStructType(StructType struct) throws T;
+
+    void visitArrayType(ArrayType array) throws T;
+
+    void visitI31Type(I31Type i31) throws T;
 
     // Extern types
     default void visitExternType(ExternType extern) throws T {
