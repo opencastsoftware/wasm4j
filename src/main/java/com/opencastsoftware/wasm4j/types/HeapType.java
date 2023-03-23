@@ -4,7 +4,6 @@
  */
 package com.opencastsoftware.wasm4j.types;
 
-import java.lang.reflect.Array;
 
 public interface HeapType extends WasmType {
     static HeapFuncType func() {
