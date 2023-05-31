@@ -1,7 +1,7 @@
 [versions]
 apacheCommonsLang = "3.12.0"
 gradleJavaConventions = "0.1.3"
-equalsVerifier = "3.14.1"
+equalsVerifier = "3.14.2"
 hamcrest = "2.2"
 jacoco = "0.8.8"
 jetBrainsAnnotations = "24.0.1"
