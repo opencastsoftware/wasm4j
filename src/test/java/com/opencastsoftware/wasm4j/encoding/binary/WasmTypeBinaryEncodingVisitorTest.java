@@ -39,6 +39,70 @@ class WasmTypeBinaryEncodingVisitorTest {
     }
 
     @Test
+    void testAnyEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        AnyType.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.ANY.opcode()}, output.toByteArray());
+    }
+
+    @Test
+    void testNoneEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        NoneType.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.NONE.opcode()}, output.toByteArray());
+    }
+
+    @Test
+    void testNoExternEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        NoExternType.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.NOEXTERN.opcode()}, output.toByteArray());
+    }
+
+    @Test
+    void testNoFuncEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        NoFuncType.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.NOFUNC.opcode()}, output.toByteArray());
+    }
+
+    @Test
+    void testEqEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        EqType.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.EQ.opcode()}, output.toByteArray());
+    }
+
+    @Test
+    void testStructEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        StructType.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.STRUCT.opcode()}, output.toByteArray());
+    }
+
+    @Test
+    void testArrayEncoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        ArrayType.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.ARRAY.opcode()}, output.toByteArray());
+    }
+
+    @Test
+    void testI31Encoding() throws IOException {
+        var output = new ByteArrayOutputStream();
+        var visitor = new WasmTypeBinaryEncodingVisitor(output);
+        I31Type.INSTANCE.accept(visitor);
+        assertArrayEquals(new byte[]{TypeOpcode.I31.opcode()}, output.toByteArray());
+    }
+
+    @Test
     void testLimitsEncoding() throws IOException {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
@@ -96,7 +160,7 @@ class WasmTypeBinaryEncodingVisitorTest {
         var output = new ByteArrayOutputStream();
         var visitor = new WasmTypeBinaryEncodingVisitor(output);
 
-        ExternType.table(Limits.of(0), RefType.heapFunc()).accept(visitor);
+        ExternType.table(Limits.of(0), RefType.nonNullable(HeapType.func())).accept(visitor);
         ExternType.table(Limits.of(0), RefType.nullable(HeapType.typeId(-1))).accept(visitor);
 
         assertArrayEquals(new byte[]{
