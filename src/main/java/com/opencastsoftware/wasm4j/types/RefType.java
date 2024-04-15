@@ -29,12 +29,44 @@ public class RefType implements ValType {
         return new RefType(false, heapType);
     }
 
-    public static RefType heapFunc() {
-        return new RefType(false, HeapType.func());
+    public static RefType funcRef() {
+        return new RefType(true, HeapType.func());
     }
 
-    public static RefType heapExtern() {
-        return new RefType(false, HeapType.extern());
+    public static RefType externRef() {
+        return new RefType(true, HeapType.extern());
+    }
+
+    public static RefType anyRef() {
+        return new RefType(true, HeapType.any());
+    }
+
+    public static RefType nullRef() {
+        return new RefType(true, HeapType.none());
+    }
+
+    public static RefType nullExternRef() {
+        return new RefType(true, HeapType.noExtern());
+    }
+
+    public static RefType nullFuncRef() {
+        return new RefType(true, HeapType.noFunc());
+    }
+
+    public static RefType eqRef() {
+        return new RefType(true, HeapType.eq());
+    }
+
+    public static RefType structRef() {
+        return new RefType(true, HeapType.struct());
+    }
+
+    public static RefType arrayRef() {
+        return new RefType(true, HeapType.array());
+    }
+
+    public static RefType i31Ref() {
+        return new RefType(true, HeapType.i31());
     }
 
     @Override
