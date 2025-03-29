@@ -32,6 +32,46 @@ public class WasmTypeBinaryEncodingVisitor implements WasmTypeVisitor<IOExceptio
     }
 
     @Override
+    public void visitAnyType(AnyType any) throws IOException {
+        output.write(TypeOpcode.ANY.opcode());
+    }
+
+    @Override
+    public void visitNoneType(NoneType none) throws IOException {
+        output.write(TypeOpcode.NONE.opcode());
+    }
+
+    @Override
+    public void visitNoExternType(NoExternType noExtern) throws IOException {
+        output.write(TypeOpcode.NOEXTERN.opcode());
+    }
+
+    @Override
+    public void visitNoFuncType(NoFuncType noFunc) throws IOException {
+        output.write(TypeOpcode.NOFUNC.opcode());
+    }
+
+    @Override
+    public void visitEqType(EqType eq) throws IOException {
+        output.write(TypeOpcode.EQ.opcode());
+    }
+
+    @Override
+    public void visitStructType(StructType struct) throws IOException {
+        output.write(TypeOpcode.STRUCT.opcode());
+    }
+
+    @Override
+    public void visitArrayType(ArrayType array) throws IOException {
+        output.write(TypeOpcode.ARRAY.opcode());
+    }
+
+    @Override
+    public void visitI31Type(I31Type i31) throws IOException {
+        output.write(TypeOpcode.I31.opcode());
+    }
+
+    @Override
     public void visitLimits(Limits limits) throws IOException {
         if (limits.max() == null) {
             output.write(0x00);

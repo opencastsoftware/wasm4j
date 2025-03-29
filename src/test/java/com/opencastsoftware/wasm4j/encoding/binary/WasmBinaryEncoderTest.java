@@ -86,7 +86,7 @@ class WasmBinaryEncoderTest {
 
         encoder.encodeImports(output, List.of(
                 new Import("A", "a", Import.Descriptor.func(16)),
-                new Import("B", "b", Import.Descriptor.table(ExternType.table(Limits.of(1), RefType.heapExtern()))),
+                new Import("B", "b", Import.Descriptor.table(ExternType.table(Limits.of(1), RefType.nonNullable(HeapType.extern())))),
                 new Import("C", "c", Import.Descriptor.mem(ExternType.mem(Limits.of(1, 5)))),
                 new Import("D", "d", Import.Descriptor.global(ExternType.global(false, NumType.i32())))
         ));
