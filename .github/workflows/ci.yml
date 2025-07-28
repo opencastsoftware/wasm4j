@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Install Binaryen
-        uses: jaxxstorm/action-install-gh-release@c5ead9a448b4660cf1e7866ee22e4dc56538031a # v1
+        uses: jaxxstorm/action-install-gh-release@cd6b2b78ad38bdd294341cda064ec0692b06215b # v1
         with:
           repo: WebAssembly/binaryen
           tag: version_112
